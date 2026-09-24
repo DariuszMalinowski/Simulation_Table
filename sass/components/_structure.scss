@@ -50,7 +50,13 @@
 
   flex: 1;
 
-  padding: 14px;
+  // 46 px odpowiada wysokości nagłówka godzin timeline.
+  // Dzięki temu pierwsza jednostka zaczyna się
+  // poniżej skali czasu.
+  padding:
+    60px
+    14px
+    14px;
 
   overflow-y: auto;
   overflow-x: hidden;

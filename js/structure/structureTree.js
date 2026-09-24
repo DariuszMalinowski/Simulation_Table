@@ -4,12 +4,25 @@ import {
   UNIT_TYPES
 } from "../data/units.js";
 
+import {
+  getUnitSymbolPath
+} from "../data/unitSymbols.js";
+
 
 // --------------------------------------------------
 // STATE
 // --------------------------------------------------
 
 let selectedUnitId = null;
+
+/*
+ * Przechowuje identyfikatory jednostek,
+ * których podległe elementy są zwinięte.
+ *
+ * Jest to wyłącznie stan interfejsu,
+ * dlatego nie zapisujemy go w modelu jednostki.
+ */
+const collapsedUnitIds = new Set();
 
 
 // --------------------------------------------------
@@ -45,9 +58,11 @@ function getTypeLabel(unit) {
 // --------------------------------------------------
 
 function createEmptyState() {
-  const empty = document.createElement("div");
+  const empty =
+    document.createElement("div");
 
-  empty.className = "structure-empty";
+  empty.className =
+    "structure-empty";
 
   empty.innerHTML = `
     <div class="structure-empty__icon">+</div>
@@ -66,20 +81,146 @@ function createEmptyState() {
 
 
 // --------------------------------------------------
+// UNIT SYMBOL
+// --------------------------------------------------
+
+function createUnitSymbol(unit) {
+  const symbol =
+    document.createElement("span");
+
+  symbol.className =
+    "structure-unit__symbol";
+
+
+  const symbolPath =
+    getUnitSymbolPath(unit);
+
+
+  /*
+   * Jeżeli dla danego typu i strony istnieje
+   * symbol SVG, wyświetlamy go.
+   *
+   * Jeżeli symbol nie został jeszcze zdefiniowany,
+   * pozostawiamy prosty symbol zastępczy.
+   */
+
+  if (symbolPath) {
+    const image =
+      document.createElement("img");
+
+    image.src = symbolPath;
+    image.alt = "";
+    image.className =
+      "structure-unit__symbol-image";
+
+    symbol.appendChild(image);
+  } else {
+    symbol.textContent = "□";
+  }
+
+
+  return symbol;
+}
+
+
+// --------------------------------------------------
+// EXPAND INDICATOR
+// --------------------------------------------------
+
+function createExpandIndicator(
+  unit,
+  hasChildren
+) {
+  const expand =
+    document.createElement("span");
+
+  expand.className =
+    "structure-unit__expand";
+
+
+  /*
+   * Jednostka bez podległych elementów
+   * nie otrzymuje aktywnej strzałki.
+   */
+  if (!hasChildren) {
+    return expand;
+  }
+
+
+  const isCollapsed =
+    collapsedUnitIds.has(unit.id);
+
+
+  expand.textContent =
+    isCollapsed ? "▸" : "▾";
+
+
+  expand.classList.add(
+    "structure-unit__expand--active"
+  );
+
+
+  expand.title =
+    isCollapsed
+      ? "Rozwiń jednostki podległe"
+      : "Zwiń jednostki podległe";
+
+
+  expand.addEventListener(
+    "click",
+    event => {
+      /*
+       * Kliknięcie strzałki nie może
+       * jednocześnie zaznaczać jednostki.
+       */
+      event.stopPropagation();
+
+
+      if (
+        collapsedUnitIds.has(unit.id)
+      ) {
+        collapsedUnitIds.delete(
+          unit.id
+        );
+      } else {
+        collapsedUnitIds.add(
+          unit.id
+        );
+      }
+
+
+      renderStructureTree();
+    }
+  );
+
+
+  return expand;
+}
+
+
+// --------------------------------------------------
 // UNIT ROW
 // --------------------------------------------------
 
-function createUnitRow(unit, hasChildren) {
-  const row = document.createElement("button");
+function createUnitRow(
+  unit,
+  hasChildren
+) {
+  const row =
+    document.createElement("button");
 
   row.type = "button";
-  row.className = "structure-unit";
+  row.className =
+    "structure-unit";
 
-  row.dataset.unitId = unit.id;
+  row.dataset.unitId =
+    unit.id;
 
 
   if (unit.id === selectedUnitId) {
-    row.classList.add("structure-unit--selected");
+    row.classList.add(
+      "structure-unit--selected"
+    );
   }
 
 
@@ -87,49 +228,47 @@ function createUnitRow(unit, hasChildren) {
   // EXPAND INDICATOR
   // ----------------------------------------------
 
-  const expand = document.createElement("span");
-
-  expand.className = "structure-unit__expand";
-
-  expand.textContent =
-    hasChildren ? "▾" : "";
+  const expand =
+    createExpandIndicator(
+      unit,
+      hasChildren
+    );
 
 
   // ----------------------------------------------
-  // PLACEHOLDER FOR SVG
+  // UNIT SYMBOL
   // ----------------------------------------------
 
-  const symbol = document.createElement("span");
-
-  symbol.className = "structure-unit__symbol";
-
-  /*
-   * Na razie używamy prostego znacznika.
-   * W następnym etapie tutaj podepniemy
-   * właściwy symbol SVG jednostki.
-   */
-
-  symbol.textContent = "□";
+  const symbol =
+    createUnitSymbol(unit);
 
 
   // ----------------------------------------------
   // INFO
   // ----------------------------------------------
 
-  const info = document.createElement("span");
+  const info =
+    document.createElement("span");
 
-  info.className = "structure-unit__info";
-
-
-  const name = document.createElement("span");
-
-  name.className = "structure-unit__name";
-  name.textContent = unit.name;
+  info.className =
+    "structure-unit__info";
 
 
-  const meta = document.createElement("span");
+  const name =
+    document.createElement("span");
 
-  meta.className = "structure-unit__meta";
+  name.className =
+    "structure-unit__name";
+
+  name.textContent =
+    unit.name;
+
+
+  const meta =
+    document.createElement("span");
+
+  meta.className =
+    "structure-unit__meta";
 
   meta.textContent =
     `${getLevelLabel(unit)} · ${getTypeLabel(unit)}`;
@@ -152,19 +291,32 @@ function createUnitRow(unit, hasChildren) {
   // SELECT
   // ----------------------------------------------
 
-  row.addEventListener("click", () => {
-    selectedUnitId = unit.id;
+  row.addEventListener(
+    "click",
+    () => {
+      selectedUnitId =
+        unit.id;
 
-    renderStructureTree();
+      renderStructureTree();
 
-    document.dispatchEvent(
-      new CustomEvent("structure:unit-selected", {
-        detail: {
-          unitId: unit.id
-        }
-      })
-    );
-  });
+
+      /*
+       * Zdarzenie będzie później wykorzystane
+       * przez harmonogram do wskazania jednostki,
+       * dla której planujemy zadania.
+       */
+      document.dispatchEvent(
+        new CustomEvent(
+          "structure:unit-selected",
+          {
+            detail: {
+              unitId: unit.id
+            }
+          }
+        )
+      );
+    }
+  );
 
 
   return row;
@@ -180,16 +332,24 @@ function createBranch(
   units,
   depth = 0
 ) {
-  const item = document.createElement("div");
+  const item =
+    document.createElement("div");
 
-  item.className = "structure-node";
+  item.className =
+    "structure-node";
 
-  item.dataset.unitId = unit.id;
-  item.dataset.depth = String(depth);
+  item.dataset.unitId =
+    unit.id;
+
+  item.dataset.depth =
+    String(depth);
 
 
   const children =
-    getChildren(units, unit.id);
+    getChildren(
+      units,
+      unit.id
+    );
 
 
   const row =
@@ -213,7 +373,23 @@ function createBranch(
   item.appendChild(row);
 
 
-  if (children.length > 0) {
+  // ----------------------------------------------
+  // CHILDREN
+  // ----------------------------------------------
+
+  const isCollapsed =
+    collapsedUnitIds.has(unit.id);
+
+
+  /*
+   * Jednostki podległe renderujemy tylko wtedy,
+   * gdy dana gałąź nie została zwinięta.
+   */
+
+  if (
+    children.length > 0 &&
+    !isCollapsed
+  ) {
     const childrenContainer =
       document.createElement("div");
 
@@ -232,7 +408,9 @@ function createBranch(
     });
 
 
-    item.appendChild(childrenContainer);
+    item.appendChild(
+      childrenContainer
+    );
   }
 
 
@@ -246,14 +424,18 @@ function createBranch(
 
 export function renderStructureTree() {
   const container =
-    document.getElementById("structureTree");
+    document.getElementById(
+      "structureTree"
+    );
 
   if (!container) {
     return;
   }
 
 
-  const units = getUnits();
+  const units =
+    getUnits();
+
 
   container.replaceChildren();
 
@@ -274,7 +456,8 @@ export function renderStructureTree() {
 
   const rootUnits =
     units.filter(
-      unit => unit.parentId === null
+      unit =>
+        unit.parentId === null
     );
 
 
