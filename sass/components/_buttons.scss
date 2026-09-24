@@ -1,0 +1,59 @@
+@use "../base/variables" as *;
+
+
+// ==================================================
+// BUTTONS
+// ==================================================
+
+.button {
+  min-height: 36px;
+
+  padding: 0 15px;
+
+  border-radius: 5px;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:focus-visible,
+.timeline-control:focus-visible {
+  outline: 2px solid $accent-light;
+  outline-offset: 2px;
+}
+
+.button--primary {
+  color: #20251b;
+
+  background: $accent;
+
+  border: 1px solid $accent-light;
+}
+
+.button--primary:hover {
+  background: $accent-light;
+}
+
+.button--secondary {
+  color: $text;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid $border;
+}
+
+.button--secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}

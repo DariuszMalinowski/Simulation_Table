@@ -1,0 +1,167 @@
+@use "../base/variables" as *;
+
+
+// ==================================================
+// STRUCTURE EDITOR
+// ==================================================
+
+.structure-editor-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(10, 12, 9, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.structure-editor {
+  width: min(100%, 520px);
+
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 10px;
+
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+
+  overflow: hidden;
+}
+
+.structure-editor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 16px 18px;
+
+  background: $panel-light;
+  border-bottom: 1px solid $border;
+}
+
+.structure-editor__title {
+  margin: 0;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  color: $text;
+}
+
+.structure-editor__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  padding: 0;
+
+  border: 1px solid transparent;
+  border-radius: 6px;
+
+  background: transparent;
+  color: $text-muted;
+
+  font-size: 24px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: $border;
+    color: $text;
+  }
+}
+
+.structure-editor__form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+
+  padding: 18px;
+}
+
+.structure-editor__field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.structure-editor__label {
+  font-size: 12px;
+  font-weight: 700;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.structure-editor__field input,
+.structure-editor__field select {
+  width: 100%;
+  min-height: 40px;
+
+  padding: 8px 10px;
+
+  border: 1px solid $border;
+  border-radius: 6px;
+
+  background: rgba(20, 23, 18, 0.85);
+  color: $text;
+
+  font: inherit;
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  &:focus {
+    border-color: $accent;
+    background: rgba(24, 28, 21, 0.95);
+  }
+}
+
+.structure-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  margin-top: 6px;
+  padding-top: 14px;
+
+  border-top: 1px solid $border;
+}
+
+@media (max-width: 600px) {
+  .structure-editor-overlay {
+    align-items: flex-end;
+    padding: 10px;
+  }
+
+  .structure-editor {
+    width: 100%;
+  }
+
+  .structure-editor__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}

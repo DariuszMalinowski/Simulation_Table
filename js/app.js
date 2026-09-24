@@ -9,8 +9,18 @@ import {
   renderTimeline
 } from "./timeline/timeline.js";
 
-import { openStructureEditor } from "./structure/structureEditor.js";
+import {
+  openStructureEditor
+} from "./structure/structureEditor.js";
 
+import {
+  renderStructureTree
+} from "./structure/structureTree.js";
+
+
+// --------------------------------------------------
+// DOM
+// --------------------------------------------------
 
 const dateInput =
   document.getElementById("planStartDate");
@@ -33,6 +43,10 @@ const footerTime =
 const addUnitButton =
   document.getElementById("addUnitButton");
 
+
+// --------------------------------------------------
+// PLAN TIME
+// --------------------------------------------------
 
 function updatePlanTime() {
   const result = setPlanTime({
@@ -59,18 +73,36 @@ function updatePlanTime() {
 }
 
 
-setButton.addEventListener(
+setButton?.addEventListener(
   "click",
   updatePlanTime
 );
 
-addUnitButton?.addEventListener("click", () => {
-  openStructureEditor({
-    onSave: unit => {
-      console.log("Dodano jednostkę:", unit);
-    }
-  });
-});
+
+// --------------------------------------------------
+// STRUCTURE
+// --------------------------------------------------
+
+addUnitButton?.addEventListener(
+  "click",
+  () => {
+    openStructureEditor({
+      onSave: unit => {
+        console.log(
+          "Dodano jednostkę:",
+          unit
+        );
+
+        renderStructureTree();
+      }
+    });
+  }
+);
+
+
+// --------------------------------------------------
+// DEFAULT DATE
+// --------------------------------------------------
 
 /**
  * Ustawiamy dzisiejszą datę jako wartość
@@ -80,13 +112,18 @@ addUnitButton?.addEventListener("click", () => {
  * symulacji — robi to użytkownik przyciskiem Ustaw.
  */
 function setDefaultDate() {
-  if (dateInput.value) {
+  if (dateInput?.value) {
+    return;
+  }
+
+  if (!dateInput) {
     return;
   }
 
   const today = new Date();
 
-  const year = today.getFullYear();
+  const year =
+    today.getFullYear();
 
   const month = String(
     today.getMonth() + 1
@@ -101,6 +138,14 @@ function setDefaultDate() {
 }
 
 
+// --------------------------------------------------
+// INIT
+// --------------------------------------------------
+
 setDefaultDate();
 
-console.log("Staff Planner uruchomiony.");
+renderStructureTree();
+
+console.log(
+  "Staff Planner uruchomiony."
+);

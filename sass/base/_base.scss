@@ -1,0 +1,99 @@
+@use "variables" as *;
+
+
+// ==================================================
+// RESET
+// ==================================================
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: "Inter", sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font-size: inherit;
+}
+
+body {
+  min-height: 100vh;
+
+  color: $text;
+
+  background:
+    linear-gradient(
+      135deg,
+      $background-dark,
+      $background-khaki
+    );
+
+  overflow: hidden;
+}
+
+
+// ==================================================
+// TACTICAL BACKGROUND
+// ==================================================
+
+.tactical-background {
+  position: fixed;
+  inset: 0;
+
+  pointer-events: none;
+
+  opacity: 0.35;
+
+  background-image:
+
+    // kilometre grid - vertical
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 79px,
+      rgba(210, 220, 190, 0.12) 80px
+    ),
+
+    // kilometre grid - horizontal
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 79px,
+      rgba(210, 220, 190, 0.12) 80px
+    ),
+
+    // smaller grid - vertical
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 19px,
+      rgba(210, 220, 190, 0.035) 20px
+    ),
+
+    // smaller grid - horizontal
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 19px,
+      rgba(210, 220, 190, 0.035) 20px
+    );
+}

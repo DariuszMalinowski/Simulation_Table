@@ -1,0 +1,28 @@
+// ==================================================
+// FOOTER
+// ==================================================
+
+.app-footer {
+  min-height: 28px;
+
+  padding: 0 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  color: rgba(230, 235, 215, 0.55);
+
+  font-size: 9px;
+
+  letter-spacing: 0.08em;
+}
+
+.app-footer__time {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

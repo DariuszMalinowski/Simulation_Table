@@ -1,0 +1,208 @@
+@use "../base/variables" as *;
+
+
+// ==================================================
+// TIMELINE
+// ==================================================
+
+.timeline-panel {
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-controls {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: $text-muted;
+
+  font-size: 11px;
+}
+
+.timeline-control {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  color: $text;
+
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid $border;
+  border-radius: 4px;
+
+  cursor: pointer;
+}
+
+.timeline-control:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+// ==================================================
+// TIMELINE CONTAINER
+// ==================================================
+
+.timeline {
+  min-width: 0;
+  min-height: 0;
+
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow-x: auto;
+  overflow-y: auto;
+
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+
+// ==================================================
+// HOURS HEADER
+// ==================================================
+
+.timeline-hours {
+  height: 46px;
+
+  // 24 godziny × 80 px
+  width: 1920px;
+  min-width: 1920px;
+
+  flex: 0 0 46px;
+
+  display: grid;
+
+  grid-template-columns: repeat(24, 80px);
+
+  align-items: stretch;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 2;
+
+  background: rgba(35, 40, 30, 0.98);
+
+  border-bottom: 1px solid $border;
+}
+
+
+// ==================================================
+// SINGLE HOUR
+// ==================================================
+
+.timeline-hour {
+  position: relative;
+
+  min-width: 0;
+
+  padding: 17px 7px 5px;
+
+  border-left: 1px solid rgba(210, 220, 190, 0.08);
+
+  strong {
+    display: block;
+
+    margin: 0;
+
+    color: $text;
+
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+
+    line-height: 1;
+  }
+}
+
+
+// ==================================================
+// DATE ABOVE HOUR
+// ==================================================
+
+.timeline-hour__date {
+  position: absolute;
+
+  top: 3px;
+  left: 7px;
+
+  display: block;
+
+  white-space: nowrap;
+
+  color: $text-muted;
+
+  font-family: "Inter", sans-serif;
+  font-size: 7px;
+  font-weight: 400;
+
+  line-height: 1;
+
+  letter-spacing: 0.04em;
+}
+
+
+// ==================================================
+// START OF NEW DAY
+// ==================================================
+
+.timeline-hour--day {
+  border-left: 2px solid rgba(197, 206, 167, 0.55);
+}
+
+.timeline-hour--day::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+  left: -2px;
+
+  width: 1px;
+
+  background: rgba(197, 206, 167, 0.25);
+}
+
+
+// ==================================================
+// TIMELINE CONTENT
+// ==================================================
+
+.timeline-content {
+  width: 1920px;
+  min-width: 1920px;
+  min-height: 100%;
+
+  flex: 1;
+
+  position: relative;
+
+  // Jedna pionowa linia co godzinę
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 79px,
+      rgba(210, 220, 190, 0.07) 79px,
+      rgba(210, 220, 190, 0.07) 80px
+    );
+}
