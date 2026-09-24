@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="description"
+    content="Staff Planner — planer i harmonogram działań jednostek"
+  >
+
+  <title>Staff Planner</title>
+
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+  <div class="tactical-background" aria-hidden="true"></div>
+
+  <div class="app">
+
+    <!-- ==================================================
+         HEADER
+    =================================================== -->
+
+    <header class="app-header">
+
+      <div class="app-title">
+
+        <span class="app-title__mark">SP</span>
+
+        <div>
+          <h1>Staff Planner</h1>
+          <p>Planowanie i harmonogram działań</p>
+        </div>
+
+      </div>
+
+
+      <!-- CZAS POCZĄTKOWY PLANU -->
+
+      <div class="plan-time">
+
+        <div class="plan-time__title">
+          <span class="panel-label">CZAS POCZĄTKOWY SYMULACJI</span>
+
+          <strong
+            id="planStartDtg"
+            class="plan-time__dtg"
+          >
+            -- ---- --- --
+          </strong>
+        </div>
+
+
+        <div class="plan-time__fields">
+
+          <label class="plan-time__field">
+
+            <span>Data</span>
+
+            <input
+              id="planStartDate"
+              type="date"
+              autocomplete="off"
+            >
+
+          </label>
+
+
+          <label class="plan-time__field">
+
+            <span>Godzina</span>
+
+            <input
+              id="planStartTime"
+              type="time"
+              value="06:00"
+              step="60"
+              autocomplete="off"
+            >
+
+          </label>
+
+
+          <label class="plan-time__field plan-time__field--zone">
+
+            <span>Strefa</span>
+
+            <select id="planTimeZone">
+            <option value="Y">Y — UTC−12</option>
+            <option value="X">X — UTC−11</option>
+            <option value="W">W — UTC−10</option>
+            <option value="V">V — UTC−9</option>
+            <option value="U">U — UTC−8</option>
+            <option value="T">T — UTC−7</option>
+            <option value="S">S — UTC−6</option>
+            <option value="R">R — UTC−5</option>
+            <option value="Q">Q — UTC−4</option>
+            <option value="P">P — UTC−3</option>
+            <option value="O">O — UTC−2</option>
+            <option value="N">N — UTC−1</option>
+
+            <option value="Z">Z — UTC±0</option>
+
+            <option value="A">A — UTC+1</option>
+            <option value="B" selected>B — UTC+2</option>
+            <option value="C">C — UTC+3</option>
+            <option value="D">D — UTC+4</option>
+            <option value="E">E — UTC+5</option>
+            <option value="F">F — UTC+6</option>
+            <option value="G">G — UTC+7</option>
+            <option value="H">H — UTC+8</option>
+            <option value="I">I — UTC+9</option>
+            <option value="K">K — UTC+10</option>
+            <option value="L">L — UTC+11</option>
+            <option value="M">M — UTC+12</option>
+            </select>
+
+          </label>
+
+
+          <button
+            id="setPlanStartButton"
+            class="button button--primary"
+            type="button"
+          >
+            Ustaw
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- OPERACJE NA PROJEKCIE -->
+
+      <div class="app-actions">
+
+        <button
+          id="loadProjectButton"
+          class="button button--secondary"
+          type="button"
+        >
+          Wczytaj
+        </button>
+
+        <button
+          id="saveProjectButton"
+          class="button button--secondary"
+          type="button"
+        >
+          Zapisz
+        </button>
+
+        <button
+          id="exportPdfButton"
+          class="button button--secondary"
+          type="button"
+        >
+          PDF
+        </button>
+
+        <button
+          id="exportDocxButton"
+          class="button button--secondary"
+          type="button"
+        >
+          DOCX
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- ==================================================
+         GŁÓWNY PLANER
+    =================================================== -->
+
+    <main class="planner">
+
+      <!-- STRUKTURA -->
+
+      <section class="structure-panel">
+
+        <div class="panel-header">
+
+          <div>
+            <span class="panel-label">STRUKTURA</span>
+            <h2>Jednostki</h2>
+          </div>
+
+          <button
+            id="addUnitButton"
+            class="button button--primary"
+            type="button"
+          >
+            + Dodaj
+          </button>
+
+        </div>
+
+
+        <div
+          id="structureTree"
+          class="structure-tree"
+        >
+
+          <div class="empty-state">
+
+            <div class="empty-state__icon">
+              +
+            </div>
+
+            <strong>Brak jednostek</strong>
+
+            <span>
+              Utwórz pierwszą jednostkę,
+              aby rozpocząć planowanie.
+            </span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- OŚ CZASU -->
+
+      <section class="timeline-panel">
+
+        <div class="timeline-header">
+
+          <div>
+            <span class="panel-label">HARMONOGRAM</span>
+            <h2>Oś czasu</h2>
+          </div>
+
+
+          <div class="timeline-controls">
+
+            <button
+              id="timelineZoomOut"
+              class="timeline-control"
+              type="button"
+              aria-label="Zmniejsz skalę osi czasu"
+            >
+              −
+            </button>
+
+            <span id="timelineScale">
+              1 h
+            </span>
+
+            <button
+              id="timelineZoomIn"
+              class="timeline-control"
+              type="button"
+              aria-label="Zwiększ skalę osi czasu"
+            >
+              +
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="timeline">
+
+          <!--
+            Nagłówek osi czasu będzie generowany
+            dynamicznie przez JavaScript.
+
+            Nie wpisujemy tutaj na stałe:
+            06:00, 07:00, 08:00 itd.
+
+            Początek osi będzie wynikał z czasu
+            początkowego całego planu.
+          -->
+
+          <div
+            id="timelineHeader"
+            class="timeline-hours"
+          ></div>
+
+
+          <div
+            id="timelineContent"
+            class="timeline-content"
+          >
+
+            <div class="timeline-empty">
+
+              <strong>
+                Brak zaplanowanych działań
+              </strong>
+
+              <span>
+                Ustaw czas początkowy planu,
+                dodaj jednostki do struktury,
+                a następnie przypisz im zadania.
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+
+    <!-- ==================================================
+         FOOTER
+    =================================================== -->
+
+    <footer class="app-footer">
+
+      <span>STAFF PLANNER</span>
+
+      <span
+        id="currentPlanTime"
+        class="app-footer__time"
+      >
+        DTG: —
+      </span>
+
+      <span id="saveStatus">
+        Projekt lokalny
+      </span>
+
+    </footer>
+
+  </div>
+
+
+  <script
+    type="module"
+    src="/js/app.js"
+  ></script>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "staff-planner",
+  "version": "0.1.0",
+  "description": "Planer i harmonogram działań jednostek",
+  "license": "ISC",
+  "author": "Malina",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"sass --watch sass/style.scss css/style.css\" \"vite --host 0.0.0.0\"",
+    "build": "sass sass/style.scss css/style.css --style compressed && vite build",
+    "build:sass": "sass sass/style.scss css/style.css",
+    "watch:sass": "sass --watch sass/style.scss css/style.css",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "sass": "^1.99.0",
+    "vite": "^7.3.6"
+  },
+  "dependencies": {}
+}
