@@ -71,30 +71,32 @@
 .structure-unit {
   --structure-depth: 0;
 
+  position: relative;
+
   width: 100%;
   min-height: 52px;
 
   display: grid;
-  grid-template-columns: 16px 32px minmax(0, 1fr);
+  grid-template-columns:
+    16px
+    minmax(0, 1fr)
+    auto;
+
   align-items: center;
 
   gap: 8px;
 
   padding:
-    6px
-    10px
-    6px
+    0
+    8px
+    0
     calc(8px + (var(--structure-depth) * 18px));
 
-  border: 0;
   border-bottom: 1px solid $border;
 
   background: transparent;
+
   color: $text;
-
-  text-align: left;
-
-  cursor: pointer;
 
   transition:
     background 0.15s ease,
@@ -104,6 +106,7 @@
     background: rgba(255, 255, 255, 0.04);
   }
 }
+
 
 .structure-unit--selected {
   background: rgba(168, 180, 134, 0.12);
@@ -118,25 +121,70 @@
 
 
 // --------------------------------------------------
+// MAIN SELECT AREA
+// --------------------------------------------------
+
+.structure-unit__main {
+  min-width: 0;
+  min-height: 51px;
+
+  display: grid;
+  grid-template-columns:
+    32px
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 6px 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: inherit;
+
+  font: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+
+// --------------------------------------------------
 // EXPAND
 // --------------------------------------------------
 
 .structure-unit__expand {
   width: 16px;
-  height: 24px;
+  height: 28px;
+
+  padding: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
+  border: 0;
+
+  background: transparent;
+
   color: $text-muted;
 
+  font: inherit;
   font-size: 11px;
 
   cursor: default;
 
   user-select: none;
+
+  &:disabled {
+    opacity: 0;
+  }
 }
+
 
 .structure-unit__expand--active {
   cursor: pointer;
@@ -147,10 +195,113 @@
 
   &:hover {
     color: $accent-light;
+
     transform: scale(1.15);
   }
 }
 
+
+// --------------------------------------------------
+// ACTIONS
+// --------------------------------------------------
+
+.structure-unit__actions {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+}
+
+
+.structure-unit__menu-button {
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid $border;
+  border-radius: 4px;
+
+  background: rgba(255, 255, 255, 0.03);
+
+  color: $text-muted;
+
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+
+    color: $text;
+  }
+}
+
+
+// --------------------------------------------------
+// MENU
+// --------------------------------------------------
+
+.structure-unit__menu {
+  position: absolute;
+
+  top: calc(100% + 4px);
+  right: 0;
+
+  z-index: 20;
+
+  min-width: 170px;
+
+  display: none;
+
+  padding: 4px;
+
+  border: 1px solid $border;
+  border-radius: 5px;
+
+  background: $panel;
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+
+.structure-unit__menu--open {
+  display: block;
+}
+
+
+.structure-unit__menu-item {
+  width: 100%;
+
+  padding: 8px 10px;
+
+  border: 0;
+  border-radius: 3px;
+
+  background: transparent;
+
+  color: $text;
+
+  font: inherit;
+  font-size: 12px;
+
+  text-align: left;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(168, 180, 134, 0.14);
+  }
+}
 
 // --------------------------------------------------
 // SYMBOL

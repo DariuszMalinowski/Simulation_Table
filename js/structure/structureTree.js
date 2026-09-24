@@ -8,6 +8,10 @@ import {
   getUnitSymbolPath
 } from "../data/unitSymbols.js";
 
+import {
+  openStructureEditor
+} from "./structureEditor.js";
+
 
 // --------------------------------------------------
 // STATE
@@ -15,23 +19,21 @@ import {
 
 let selectedUnitId = null;
 
-/*
- * Przechowuje identyfikatory jednostek,
- * których podległe elementy są zwinięte.
- *
- * Jest to wyłącznie stan interfejsu,
- * dlatego nie zapisujemy go w modelu jednostki.
- */
-const collapsedUnitIds = new Set();
+const collapsedUnitIds =
+  new Set();
 
 
 // --------------------------------------------------
 // HELPERS
 // --------------------------------------------------
 
-function getChildren(units, parentId) {
+function getChildren(
+  units,
+  parentId
+) {
   return units.filter(
-    unit => unit.parentId === parentId
+    unit =>
+      unit.parentId === parentId
   );
 }
 
@@ -54,6 +56,30 @@ function getTypeLabel(unit) {
 
 
 // --------------------------------------------------
+// SELECT UNIT
+// --------------------------------------------------
+
+function selectUnit(unit) {
+  selectedUnitId =
+    unit.id;
+
+  renderStructureTree();
+
+
+  document.dispatchEvent(
+    new CustomEvent(
+      "structure:unit-selected",
+      {
+        detail: {
+          unitId: unit.id
+        }
+      }
+    )
+  );
+}
+
+
+// --------------------------------------------------
 // EMPTY STATE
 // --------------------------------------------------
 
@@ -65,7 +91,9 @@ function createEmptyState() {
     "structure-empty";
 
   empty.innerHTML = `
-    <div class="structure-empty__icon">+</div>
+    <div class="structure-empty__icon">
+      +
+    </div>
 
     <strong class="structure-empty__title">
       Brak jednostek
@@ -96,26 +124,24 @@ function createUnitSymbol(unit) {
     getUnitSymbolPath(unit);
 
 
-  /*
-   * Jeżeli dla danego typu i strony istnieje
-   * symbol SVG, wyświetlamy go.
-   *
-   * Jeżeli symbol nie został jeszcze zdefiniowany,
-   * pozostawiamy prosty symbol zastępczy.
-   */
-
   if (symbolPath) {
     const image =
       document.createElement("img");
 
-    image.src = symbolPath;
+    image.src =
+      symbolPath;
+
     image.alt = "";
+
     image.className =
       "structure-unit__symbol-image";
 
-    symbol.appendChild(image);
+    symbol.appendChild(
+      image
+    );
   } else {
-    symbol.textContent = "□";
+    symbol.textContent =
+      "□";
   }
 
 
@@ -132,27 +158,37 @@ function createExpandIndicator(
   hasChildren
 ) {
   const expand =
-    document.createElement("span");
+    document.createElement("button");
+
+  expand.type =
+    "button";
 
   expand.className =
     "structure-unit__expand";
 
 
-  /*
-   * Jednostka bez podległych elementów
-   * nie otrzymuje aktywnej strzałki.
-   */
   if (!hasChildren) {
+    expand.disabled = true;
+
+    expand.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+
     return expand;
   }
 
 
   const isCollapsed =
-    collapsedUnitIds.has(unit.id);
+    collapsedUnitIds.has(
+      unit.id
+    );
 
 
   expand.textContent =
-    isCollapsed ? "▸" : "▾";
+    isCollapsed
+      ? "▸"
+      : "▾";
 
 
   expand.classList.add(
@@ -166,18 +202,28 @@ function createExpandIndicator(
       : "Zwiń jednostki podległe";
 
 
+  expand.setAttribute(
+    "aria-label",
+    expand.title
+  );
+
+
+  expand.setAttribute(
+    "aria-expanded",
+    String(!isCollapsed)
+  );
+
+
   expand.addEventListener(
     "click",
     event => {
-      /*
-       * Kliknięcie strzałki nie może
-       * jednocześnie zaznaczać jednostki.
-       */
       event.stopPropagation();
 
 
       if (
-        collapsedUnitIds.has(unit.id)
+        collapsedUnitIds.has(
+          unit.id
+        )
       ) {
         collapsedUnitIds.delete(
           unit.id
@@ -199,6 +245,124 @@ function createExpandIndicator(
 
 
 // --------------------------------------------------
+// UNIT ACTIONS
+// --------------------------------------------------
+
+function createUnitActions(unit) {
+  const actions =
+    document.createElement("div");
+
+  actions.className =
+    "structure-unit__actions";
+
+
+  const menuButton =
+    document.createElement("button");
+
+  menuButton.type =
+    "button";
+
+  menuButton.className =
+    "structure-unit__menu-button";
+
+  menuButton.textContent =
+    "⋯";
+
+  menuButton.title =
+    "Opcje jednostki";
+
+  menuButton.setAttribute(
+    "aria-label",
+    `Opcje jednostki ${unit.name}`
+  );
+
+
+  const menu =
+    document.createElement("div");
+
+  menu.className =
+    "structure-unit__menu";
+
+
+  const addChildButton =
+    document.createElement("button");
+
+  addChildButton.type =
+    "button";
+
+  addChildButton.className =
+    "structure-unit__menu-item";
+
+  addChildButton.textContent =
+    "+ Dodaj podległą";
+
+
+  menu.appendChild(
+    addChildButton
+  );
+
+
+  // ----------------------------------------------
+  // OPEN / CLOSE MENU
+  // ----------------------------------------------
+
+  menuButton.addEventListener(
+    "click",
+    event => {
+      event.stopPropagation();
+
+      menu.classList.toggle(
+        "structure-unit__menu--open"
+      );
+    }
+  );
+
+
+  // ----------------------------------------------
+  // ADD CHILD
+  // ----------------------------------------------
+
+  addChildButton.addEventListener(
+    "click",
+    event => {
+      event.stopPropagation();
+
+
+      openStructureEditor({
+        parentId: unit.id,
+
+        onSave: () => {
+          /*
+           * Jeżeli gałąź była zwinięta,
+           * po dodaniu jednostki rozwijamy ją,
+           * aby użytkownik od razu zobaczył
+           * nowo utworzoną jednostkę.
+           */
+          collapsedUnitIds.delete(
+            unit.id
+          );
+
+          renderStructureTree();
+        }
+      });
+    }
+  );
+
+
+  actions.appendChild(
+    menuButton
+  );
+
+  actions.appendChild(
+    menu
+  );
+
+
+  return actions;
+}
+
+
+// --------------------------------------------------
 // UNIT ROW
 // --------------------------------------------------
 
@@ -206,10 +370,18 @@ function createUnitRow(
   unit,
   hasChildren
 ) {
+  /*
+   * Wiersz nie jest już <button>.
+   *
+   * Dzięki temu możemy bezpiecznie umieścić
+   * w nim osobne przyciski:
+   *
+   * - rozwijanie struktury,
+   * - menu jednostki.
+   */
   const row =
-    document.createElement("button");
+    document.createElement("div");
 
-  row.type = "button";
   row.className =
     "structure-unit";
 
@@ -217,7 +389,11 @@ function createUnitRow(
     unit.id;
 
 
-  if (unit.id === selectedUnitId) {
+  const isSelected =
+    unit.id === selectedUnitId;
+
+
+  if (isSelected) {
     row.classList.add(
       "structure-unit--selected"
     );
@@ -225,7 +401,7 @@ function createUnitRow(
 
 
   // ----------------------------------------------
-  // EXPAND INDICATOR
+  // EXPAND
   // ----------------------------------------------
 
   const expand =
@@ -236,16 +412,22 @@ function createUnitRow(
 
 
   // ----------------------------------------------
-  // UNIT SYMBOL
+  // MAIN / SELECT AREA
   // ----------------------------------------------
+
+  const main =
+    document.createElement("button");
+
+  main.type =
+    "button";
+
+  main.className =
+    "structure-unit__main";
+
 
   const symbol =
     createUnitSymbol(unit);
 
-
-  // ----------------------------------------------
-  // INFO
-  // ----------------------------------------------
 
   const info =
     document.createElement("span");
@@ -274,49 +456,54 @@ function createUnitRow(
     `${getLevelLabel(unit)} · ${getTypeLabel(unit)}`;
 
 
-  info.appendChild(name);
-  info.appendChild(meta);
+  info.appendChild(
+    name
+  );
+
+  info.appendChild(
+    meta
+  );
+
+
+  main.appendChild(
+    symbol
+  );
+
+  main.appendChild(
+    info
+  );
+
+
+  main.addEventListener(
+    "click",
+    () => {
+      selectUnit(unit);
+    }
+  );
 
 
   // ----------------------------------------------
   // ROW
   // ----------------------------------------------
 
-  row.appendChild(expand);
-  row.appendChild(symbol);
-  row.appendChild(info);
-
-
-  // ----------------------------------------------
-  // SELECT
-  // ----------------------------------------------
-
-  row.addEventListener(
-    "click",
-    () => {
-      selectedUnitId =
-        unit.id;
-
-      renderStructureTree();
-
-
-      /*
-       * Zdarzenie będzie później wykorzystane
-       * przez harmonogram do wskazania jednostki,
-       * dla której planujemy zadania.
-       */
-      document.dispatchEvent(
-        new CustomEvent(
-          "structure:unit-selected",
-          {
-            detail: {
-              unitId: unit.id
-            }
-          }
-        )
-      );
-    }
+  row.appendChild(
+    expand
   );
+
+  row.appendChild(
+    main
+  );
+
+
+  /*
+   * Menu pokazujemy wyłącznie
+   * przy aktualnie zaznaczonej jednostce.
+   */
+  if (isSelected) {
+    row.appendChild(
+      createUnitActions(unit)
+    );
+  }
 
 
   return row;
@@ -359,18 +546,15 @@ function createBranch(
     );
 
 
-  /*
-   * Wcięcie zależy od miejsca jednostki
-   * w strukturze, a nie od jej szczebla.
-   */
-
   row.style.setProperty(
     "--structure-depth",
     depth
   );
 
 
-  item.appendChild(row);
+  item.appendChild(
+    row
+  );
 
 
   // ----------------------------------------------
@@ -378,13 +562,10 @@ function createBranch(
   // ----------------------------------------------
 
   const isCollapsed =
-    collapsedUnitIds.has(unit.id);
+    collapsedUnitIds.has(
+      unit.id
+    );
 
-
-  /*
-   * Jednostki podległe renderujemy tylko wtedy,
-   * gdy dana gałąź nie została zwinięta.
-   */
 
   if (
     children.length > 0 &&
@@ -397,15 +578,17 @@ function createBranch(
       "structure-node__children";
 
 
-    children.forEach(child => {
-      childrenContainer.appendChild(
-        createBranch(
-          child,
-          units,
-          depth + 1
-        )
-      );
-    });
+    children.forEach(
+      child => {
+        childrenContainer.appendChild(
+          createBranch(
+            child,
+            units,
+            depth + 1
+          )
+        );
+      }
+    );
 
 
     item.appendChild(
@@ -428,6 +611,7 @@ export function renderStructureTree() {
       "structureTree"
     );
 
+
   if (!container) {
     return;
   }
@@ -449,11 +633,6 @@ export function renderStructureTree() {
   }
 
 
-  /*
-   * Jednostki bez przełożonego są korzeniami
-   * poszczególnych struktur.
-   */
-
   const rootUnits =
     units.filter(
       unit =>
@@ -461,15 +640,17 @@ export function renderStructureTree() {
     );
 
 
-  rootUnits.forEach(unit => {
-    container.appendChild(
-      createBranch(
-        unit,
-        units,
-        0
-      )
-    );
-  });
+  rootUnits.forEach(
+    unit => {
+      container.appendChild(
+        createBranch(
+          unit,
+          units,
+          0
+        )
+      );
+    }
+  );
 }
 
 

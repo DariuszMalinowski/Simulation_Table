@@ -3,7 +3,8 @@ import {
   UNIT_TYPES,
   UNIT_FACTIONS,
   createUnit,
-  getUnits
+  getUnits,
+  getUnitById
 } from "../data/units.js";
 
 
@@ -12,7 +13,8 @@ import {
 // --------------------------------------------------
 
 function createOption(value, label) {
-  const option = document.createElement("option");
+  const option =
+    document.createElement("option");
 
   option.value = value;
   option.textContent = label;
@@ -21,8 +23,12 @@ function createOption(value, label) {
 }
 
 
-function createSelectFromObject(data, emptyLabel = null) {
-  const select = document.createElement("select");
+function createSelectFromObject(
+  data,
+  emptyLabel = null
+) {
+  const select =
+    document.createElement("select");
 
   if (emptyLabel) {
     select.appendChild(
@@ -32,7 +38,10 @@ function createSelectFromObject(data, emptyLabel = null) {
 
   Object.values(data).forEach(item => {
     select.appendChild(
-      createOption(item.id, item.label)
+      createOption(
+        item.id,
+        item.label
+      )
     );
   });
 
@@ -41,18 +50,54 @@ function createSelectFromObject(data, emptyLabel = null) {
 
 
 // --------------------------------------------------
+// DEFAULT CHILD LEVEL
+// --------------------------------------------------
+
+function getDefaultChildLevel(parentLevel) {
+  /*
+   * Domyślny kolejny szczebel jednostki.
+   *
+   * Jest to tylko sugestia formularza.
+   * Użytkownik nadal może ręcznie wybrać
+   * dowolny inny szczebel.
+   */
+
+  const nextLevel = {
+    brigade: "regiment",
+    regiment: "battalion",
+    battalion: "company",
+    company: "platoon",
+    platoon: "squad"
+  };
+
+  return nextLevel[parentLevel] || null;
+}
+
+
+// --------------------------------------------------
 // FIELD
 // --------------------------------------------------
 
-function createField(labelText, input) {
-  const label = document.createElement("label");
+function createField(
+  labelText,
+  input
+) {
+  const label =
+    document.createElement("label");
 
-  label.className = "structure-editor__field";
+  label.className =
+    "structure-editor__field";
 
-  const title = document.createElement("span");
 
-  title.className = "structure-editor__label";
-  title.textContent = labelText;
+  const title =
+    document.createElement("span");
+
+  title.className =
+    "structure-editor__label";
+
+  title.textContent =
+    labelText;
+
 
   label.appendChild(title);
   label.appendChild(input);
@@ -66,13 +111,21 @@ function createField(labelText, input) {
 // --------------------------------------------------
 
 function createParentSelect() {
-  const select = document.createElement("select");
+  const select =
+    document.createElement("select");
+
 
   select.appendChild(
-    createOption("", "Brak — jednostka główna")
+    createOption(
+      "",
+      "Brak — jednostka główna"
+    )
   );
 
-  const units = getUnits();
+
+  const units =
+    getUnits();
+
 
   units.forEach(unit => {
     const level =
@@ -80,14 +133,21 @@ function createParentSelect() {
       UNIT_LEVELS[unit.level]?.label ||
       "";
 
-    const label = level
-      ? `${unit.name} — ${level}`
-      : unit.name;
+
+    const label =
+      level
+        ? `${unit.name} — ${level}`
+        : unit.name;
+
 
     select.appendChild(
-      createOption(unit.id, label)
+      createOption(
+        unit.id,
+        label
+      )
     );
   });
+
 
   return select;
 }
@@ -101,36 +161,64 @@ export function openStructureEditor({
   parentId = null,
   onSave = null
 } = {}) {
-  const overlay = document.createElement("div");
 
-  overlay.className = "structure-editor-overlay";
+  // ------------------------------------------------
+  // PARENT
+  // ------------------------------------------------
+
+  const parentUnit =
+    parentId
+      ? getUnitById(parentId)
+      : null;
 
 
-  const dialog = document.createElement("div");
+  const overlay =
+    document.createElement("div");
 
-  dialog.className = "structure-editor";
+  overlay.className =
+    "structure-editor-overlay";
+
+
+  const dialog =
+    document.createElement("div");
+
+  dialog.className =
+    "structure-editor";
 
 
   // ------------------------------------------------
   // HEADER
   // ------------------------------------------------
 
-  const header = document.createElement("div");
+  const header =
+    document.createElement("div");
 
-  header.className = "structure-editor__header";
-
-
-  const title = document.createElement("h2");
-
-  title.className = "structure-editor__title";
-  title.textContent = "Dodaj jednostkę";
+  header.className =
+    "structure-editor__header";
 
 
-  const closeButton = document.createElement("button");
+  const title =
+    document.createElement("h2");
+
+  title.className =
+    "structure-editor__title";
+
+  title.textContent =
+    parentUnit
+      ? "Dodaj jednostkę podległą"
+      : "Dodaj jednostkę";
+
+
+  const closeButton =
+    document.createElement("button");
 
   closeButton.type = "button";
-  closeButton.className = "structure-editor__close";
+
+  closeButton.className =
+    "structure-editor__close";
+
   closeButton.textContent = "×";
+
   closeButton.setAttribute(
     "aria-label",
     "Zamknij"
@@ -145,66 +233,155 @@ export function openStructureEditor({
   // FORM
   // ------------------------------------------------
 
-  const form = document.createElement("form");
+  const form =
+    document.createElement("form");
 
-  form.className = "structure-editor__form";
+  form.className =
+    "structure-editor__form";
 
 
+  // ------------------------------------------------
   // NAME
+  // ------------------------------------------------
 
-  const nameInput = document.createElement("input");
+  const nameInput =
+    document.createElement("input");
 
   nameInput.type = "text";
-  nameInput.placeholder = "np. 1 Batalion Zmechanizowany";
-  nameInput.autocomplete = "off";
+
+  nameInput.placeholder =
+    "np. 1 Batalion Zmechanizowany";
+
+  nameInput.autocomplete =
+    "off";
+
   nameInput.required = true;
 
 
+  // ------------------------------------------------
   // LEVEL
+  // ------------------------------------------------
 
   const levelSelect =
-    createSelectFromObject(UNIT_LEVELS);
+    createSelectFromObject(
+      UNIT_LEVELS
+    );
 
 
-  // TYPE
+  /*
+   * Jeżeli tworzymy jednostkę podległą,
+   * automatycznie proponujemy kolejny
+   * niższy szczebel.
+   *
+   * Przykłady:
+   *
+   * Brygada  -> Pułk
+   * Pułk     -> Batalion
+   * Batalion -> Kompania
+   * Kompania -> Pluton
+   * Pluton   -> Drużyna
+   *
+   * Select pozostaje aktywny,
+   * więc użytkownik może zmienić
+   * zaproponowany szczebel.
+   */
 
-  const typeSelect =
-    createSelectFromObject(UNIT_TYPES);
+  if (parentUnit) {
+    const defaultChildLevel =
+      getDefaultChildLevel(
+        parentUnit.level
+      );
 
-
-  // FACTION
-
-  const factionSelect =
-    createSelectFromObject(UNIT_FACTIONS);
-
-
-  // PARENT
-
-  const parentSelect = createParentSelect();
-
-  if (parentId) {
-    parentSelect.value = parentId;
+    if (defaultChildLevel) {
+      levelSelect.value =
+        defaultChildLevel;
+    }
   }
 
 
+  // ------------------------------------------------
+  // TYPE
+  // ------------------------------------------------
+
+  const typeSelect =
+    createSelectFromObject(
+      UNIT_TYPES
+    );
+
+
+  // ------------------------------------------------
+  // FACTION
+  // ------------------------------------------------
+
+  const factionSelect =
+    createSelectFromObject(
+      UNIT_FACTIONS
+    );
+
+
+  /*
+   * Jeżeli tworzymy jednostkę podległą,
+   * domyślnie dziedziczy ona stronę
+   * jednostki nadrzędnej.
+   */
+
+  if (parentUnit?.faction) {
+    factionSelect.value =
+      parentUnit.faction;
+  }
+
+
+  // ------------------------------------------------
+  // PARENT
+  // ------------------------------------------------
+
+  const parentSelect =
+    createParentSelect();
+
+
+  if (parentUnit) {
+    parentSelect.value =
+      parentUnit.id;
+  }
+
+
+  // ------------------------------------------------
+  // FIELDS
+  // ------------------------------------------------
+
   form.appendChild(
-    createField("Nazwa", nameInput)
+    createField(
+      "Nazwa",
+      nameInput
+    )
   );
 
   form.appendChild(
-    createField("Szczebel", levelSelect)
+    createField(
+      "Szczebel",
+      levelSelect
+    )
   );
 
   form.appendChild(
-    createField("Typ", typeSelect)
+    createField(
+      "Typ",
+      typeSelect
+    )
   );
 
   form.appendChild(
-    createField("Strona", factionSelect)
+    createField(
+      "Strona",
+      factionSelect
+    )
   );
 
   form.appendChild(
-    createField("Przełożony", parentSelect)
+    createField(
+      "Przełożony",
+      parentSelect
+    )
   );
 
 
@@ -212,47 +389,69 @@ export function openStructureEditor({
   // ACTIONS
   // ------------------------------------------------
 
-  const actions = document.createElement("div");
+  const actions =
+    document.createElement("div");
 
-  actions.className = "structure-editor__actions";
+  actions.className =
+    "structure-editor__actions";
 
 
   const cancelButton =
     document.createElement("button");
 
   cancelButton.type = "button";
+
   cancelButton.className =
     "button button--secondary";
 
-  cancelButton.textContent = "Anuluj";
+  cancelButton.textContent =
+    "Anuluj";
 
 
   const saveButton =
     document.createElement("button");
 
   saveButton.type = "submit";
+
   saveButton.className =
     "button button--primary";
 
-  saveButton.textContent = "Dodaj";
+  saveButton.textContent =
+    "Dodaj";
 
 
-  actions.appendChild(cancelButton);
-  actions.appendChild(saveButton);
+  actions.appendChild(
+    cancelButton
+  );
 
-  form.appendChild(actions);
+  actions.appendChild(
+    saveButton
+  );
+
+  form.appendChild(
+    actions
+  );
 
 
   // ------------------------------------------------
   // DIALOG STRUCTURE
   // ------------------------------------------------
 
-  dialog.appendChild(header);
-  dialog.appendChild(form);
+  dialog.appendChild(
+    header
+  );
 
-  overlay.appendChild(dialog);
+  dialog.appendChild(
+    form
+  );
 
-  document.body.appendChild(overlay);
+  overlay.appendChild(
+    dialog
+  );
+
+  document.body.appendChild(
+    overlay
+  );
 
 
   // ------------------------------------------------
@@ -260,6 +459,11 @@ export function openStructureEditor({
   // ------------------------------------------------
 
   function close() {
+    document.removeEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
     overlay.remove();
   }
 
@@ -279,10 +483,29 @@ export function openStructureEditor({
   overlay.addEventListener(
     "click",
     event => {
-      if (event.target === overlay) {
+      if (
+        event.target === overlay
+      ) {
         close();
       }
     }
+  );
+
+
+  // ------------------------------------------------
+  // ESCAPE
+  // ------------------------------------------------
+
+  function handleKeyDown(event) {
+    if (event.key === "Escape") {
+      close();
+    }
+  }
+
+
+  document.addEventListener(
+    "keydown",
+    handleKeyDown
   );
 
 
@@ -295,19 +518,35 @@ export function openStructureEditor({
     event => {
       event.preventDefault();
 
+
       try {
-        const unit = createUnit({
-          name: nameInput.value,
-          level: levelSelect.value,
-          type: typeSelect.value,
-          faction: factionSelect.value,
-          parentId:
-            parentSelect.value || null
-        });
+        const unit =
+          createUnit({
+            name:
+              nameInput.value,
+
+            level:
+              levelSelect.value,
+
+            type:
+              typeSelect.value,
+
+            faction:
+              factionSelect.value,
+
+            parentId:
+              parentSelect.value ||
+              null
+          });
+
 
         close();
 
-        if (typeof onSave === "function") {
+
+        if (
+          typeof onSave ===
+          "function"
+        ) {
           onSave(unit);
         }
 
@@ -327,7 +566,9 @@ export function openStructureEditor({
   // INITIAL FOCUS
   // ------------------------------------------------
 
-  requestAnimationFrame(() => {
-    nameInput.focus();
-  });
+  requestAnimationFrame(
+    () => {
+      nameInput.focus();
+    }
+  );
 }
