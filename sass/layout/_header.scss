@@ -124,21 +124,39 @@
   font-size: 12px;
   font-weight: 700;
 
-  input,
-  select {
-    height: 30px;
+ input,
+ select {
+  height: 36px;
 
-    padding: 0 6px;
+  padding: 0 8px;
 
-    color: #20251b;
+  color: $text;
 
-    background: #f3f4ee;
+  background: $background-khaki;
 
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 3px;
+  border: 1px solid rgba(168, 180, 134, 0.45);
+  border-radius: 4px;
 
-    outline: none;
-  }
+  outline: none;
+
+  font: inherit;
+  font-weight: 500;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+ }
+
+input:hover,
+select:hover {
+  background: $background-light;
+}
+
+input:focus,
+select:focus {
+  background: $background-khaki;
+  border-color: $accent;
+}
 
   input:focus,
   select:focus {
@@ -152,6 +170,11 @@
   }
 }
 
+.plan-time .button {
+  height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
 
 // ==================================================
 // APP ACTIONS
