@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="pl">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <meta
     name="description"
@@ -11,12 +15,20 @@
 
   <title>Staff Planner</title>
 
-  <link rel="stylesheet" href="/css/style.css">
+  <link
+    rel="stylesheet"
+    href="/css/style.css"
+  >
 </head>
+
 
 <body>
 
-  <div class="tactical-background" aria-hidden="true"></div>
+  <div
+    class="tactical-background"
+    aria-hidden="true"
+  ></div>
+
 
   <div class="app">
 
@@ -28,22 +40,34 @@
 
       <div class="app-title">
 
-        <span class="app-title__mark">SP</span>
+        <span class="app-title__mark">
+          SP
+        </span>
 
         <div>
-          <h1>Staff Planner</h1>
-          <p>Planowanie i harmonogram działań</p>
+          <h1>
+            Staff Planner
+          </h1>
+
+          <p>
+            Planowanie i harmonogram działań
+          </p>
         </div>
 
       </div>
 
 
-      <!-- CZAS POCZĄTKOWY PLANU -->
+      <!-- ==================================================
+           CZAS POCZĄTKOWY PLANU
+      =================================================== -->
 
       <div class="plan-time">
 
         <div class="plan-time__title">
-          <span class="panel-label">CZAS POCZĄTKOWY SYMULACJI</span>
+
+          <span class="panel-label">
+            CZAS POCZĄTKOWY SYMULACJI
+          </span>
 
           <strong
             id="planStartDtg"
@@ -51,14 +75,19 @@
           >
             -- ---- --- --
           </strong>
+
         </div>
 
 
         <div class="plan-time__fields">
 
+          <!-- DATA -->
+
           <label class="plan-time__field">
 
-            <span>Data</span>
+            <span>
+              Data
+            </span>
 
             <input
               id="planStartDate"
@@ -69,9 +98,13 @@
           </label>
 
 
+          <!-- GODZINA -->
+
           <label class="plan-time__field">
 
-            <span>Godzina</span>
+            <span>
+              Godzina
+            </span>
 
             <input
               id="planStartTime"
@@ -84,38 +117,123 @@
           </label>
 
 
-          <label class="plan-time__field plan-time__field--zone">
+          <!-- STREFA CZASOWA -->
 
-            <span>Strefa</span>
+          <label
+            class="plan-time__field plan-time__field--zone"
+          >
+
+            <span>
+              Strefa
+            </span>
 
             <select id="planTimeZone">
-            <option value="Y">Y — UTC−12</option>
-            <option value="X">X — UTC−11</option>
-            <option value="W">W — UTC−10</option>
-            <option value="V">V — UTC−9</option>
-            <option value="U">U — UTC−8</option>
-            <option value="T">T — UTC−7</option>
-            <option value="S">S — UTC−6</option>
-            <option value="R">R — UTC−5</option>
-            <option value="Q">Q — UTC−4</option>
-            <option value="P">P — UTC−3</option>
-            <option value="O">O — UTC−2</option>
-            <option value="N">N — UTC−1</option>
 
-            <option value="Z">Z — UTC±0</option>
+              <option value="Y">
+                Y — UTC−12
+              </option>
 
-            <option value="A">A — UTC+1</option>
-            <option value="B" selected>B — UTC+2</option>
-            <option value="C">C — UTC+3</option>
-            <option value="D">D — UTC+4</option>
-            <option value="E">E — UTC+5</option>
-            <option value="F">F — UTC+6</option>
-            <option value="G">G — UTC+7</option>
-            <option value="H">H — UTC+8</option>
-            <option value="I">I — UTC+9</option>
-            <option value="K">K — UTC+10</option>
-            <option value="L">L — UTC+11</option>
-            <option value="M">M — UTC+12</option>
+              <option value="X">
+                X — UTC−11
+              </option>
+
+              <option value="W">
+                W — UTC−10
+              </option>
+
+              <option value="V">
+                V — UTC−9
+              </option>
+
+              <option value="U">
+                U — UTC−8
+              </option>
+
+              <option value="T">
+                T — UTC−7
+              </option>
+
+              <option value="S">
+                S — UTC−6
+              </option>
+
+              <option value="R">
+                R — UTC−5
+              </option>
+
+              <option value="Q">
+                Q — UTC−4
+              </option>
+
+              <option value="P">
+                P — UTC−3
+              </option>
+
+              <option value="O">
+                O — UTC−2
+              </option>
+
+              <option value="N">
+                N — UTC−1
+              </option>
+
+
+              <option value="Z">
+                Z — UTC±0
+              </option>
+
+
+              <option value="A">
+                A — UTC+1
+              </option>
+
+              <option
+                value="B"
+                selected
+              >
+                B — UTC+2
+              </option>
+
+              <option value="C">
+                C — UTC+3
+              </option>
+
+              <option value="D">
+                D — UTC+4
+              </option>
+
+              <option value="E">
+                E — UTC+5
+              </option>
+
+              <option value="F">
+                F — UTC+6
+              </option>
+
+              <option value="G">
+                G — UTC+7
+              </option>
+
+              <option value="H">
+                H — UTC+8
+              </option>
+
+              <option value="I">
+                I — UTC+9
+              </option>
+
+              <option value="K">
+                K — UTC+10
+              </option>
+
+              <option value="L">
+                L — UTC+11
+              </option>
+
+              <option value="M">
+                M — UTC+12
+              </option>
+
             </select>
 
           </label>
@@ -134,7 +252,9 @@
       </div>
 
 
-      <!-- OPERACJE NA PROJEKCIE -->
+      <!-- ==================================================
+           OPERACJE NA PROJEKCIE
+      =================================================== -->
 
       <div class="app-actions">
 
@@ -146,6 +266,7 @@
           Wczytaj
         </button>
 
+
         <button
           id="saveProjectButton"
           class="button button--secondary"
@@ -154,6 +275,7 @@
           Zapisz
         </button>
 
+
         <button
           id="exportPdfButton"
           class="button button--secondary"
@@ -161,6 +283,7 @@
         >
           PDF
         </button>
+
 
         <button
           id="exportDocxButton"
@@ -181,19 +304,63 @@
 
     <main class="planner">
 
-      <!-- STRUKTURA -->
+      <!-- ==================================================
+           STRUKTURA
+      =================================================== -->
 
       <section class="structure-panel">
 
-        <div class="panel-header">
 
-          <div>
-            <span class="panel-label">STRUKTURA</span>
-            <h2>Jednostki</h2>
+        <!-- WYBÓR TRYBU PLANOWANIA -->
+
+        <div class="structure-mode-header">
+
+          <span class="panel-label">
+            STRUKTURA
+          </span>
+
+
+          <div
+            class="planning-mode"
+            role="group"
+            aria-label="Tryb planowania"
+          >
+
+            <button
+              id="planningModeUnits"
+              class="planning-mode__button planning-mode__button--active"
+              type="button"
+              aria-pressed="true"
+            >
+              Jednostki
+            </button>
+
+
+            <button
+              id="planningModeStaff"
+              class="planning-mode__button"
+              type="button"
+              aria-pressed="false"
+            >
+              Sztab
+            </button>
+
           </div>
 
+        </div>
+
+
+        <!-- OPERACJE NA STRUKTURZE -->
+
+        <div class="structure-actions-header">
+
+          <h2 id="structureModeTitle">
+            Jednostki
+          </h2>
+
+
           <button
-            id="addUnitButton"
+            id="addStructureButton"
             class="button button--primary"
             type="button"
           >
@@ -202,6 +369,8 @@
 
         </div>
 
+
+        <!-- DRZEWO STRUKTURY -->
 
         <div
           id="structureTree"
@@ -214,7 +383,9 @@
               +
             </div>
 
-            <strong>Brak jednostek</strong>
+            <strong>
+              Brak jednostek
+            </strong>
 
             <span>
               Utwórz pierwszą jednostkę,
@@ -228,15 +399,24 @@
       </section>
 
 
-      <!-- OŚ CZASU -->
+      <!-- ==================================================
+           OŚ CZASU
+      =================================================== -->
 
       <section class="timeline-panel">
 
         <div class="timeline-header">
 
           <div>
-            <span class="panel-label">HARMONOGRAM</span>
-            <h2>Oś czasu</h2>
+
+            <span class="panel-label">
+              HARMONOGRAM
+            </span>
+
+            <h2>
+              Oś czasu
+            </h2>
+
           </div>
 
 
@@ -251,9 +431,11 @@
               −
             </button>
 
+
             <span id="timelineScale">
               1 h
             </span>
+
 
             <button
               id="timelineZoomIn"
@@ -272,13 +454,10 @@
         <div class="timeline">
 
           <!--
-            Nagłówek osi czasu będzie generowany
+            Nagłówek osi czasu jest generowany
             dynamicznie przez JavaScript.
 
-            Nie wpisujemy tutaj na stałe:
-            06:00, 07:00, 08:00 itd.
-
-            Początek osi będzie wynikał z czasu
+            Początek osi wynika z czasu
             początkowego całego planu.
           -->
 
@@ -301,7 +480,7 @@
 
               <span>
                 Ustaw czas początkowy planu,
-                dodaj jednostki do struktury,
+                dodaj elementy struktury,
                 a następnie przypisz im zadania.
               </span>
 
@@ -322,7 +501,10 @@
 
     <footer class="app-footer">
 
-      <span>STAFF PLANNER</span>
+      <span>
+        STAFF PLANNER
+      </span>
+
 
       <span
         id="currentPlanTime"
@@ -330,6 +512,7 @@
       >
         DTG: —
       </span>
+
 
       <span id="saveStatus">
         Projekt lokalny
@@ -346,4 +529,5 @@
   ></script>
 
 </body>
+
 </html>

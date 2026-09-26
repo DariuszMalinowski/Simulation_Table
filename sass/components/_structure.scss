@@ -15,7 +15,11 @@
   border-right: 1px solid $border;
 }
 
-.panel-header,
+
+// ==================================================
+// SHARED PANEL HEADER
+// ==================================================
+
 .timeline-header {
   min-height: 70px;
 
@@ -36,6 +40,7 @@
   }
 }
 
+
 .panel-label {
   color: $accent;
 
@@ -45,16 +50,149 @@
   letter-spacing: 0.18em;
 }
 
+
+// ==================================================
+// STRUCTURE MODE HEADER
+// ==================================================
+
+.structure-mode-header {
+  min-height: 70px;
+
+  padding:
+    10px
+    14px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  gap: 7px;
+
+  border-bottom: 1px solid $border;
+}
+
+
+// ==================================================
+// PLANNING MODE
+// ==================================================
+
+.planning-mode {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 0;
+}
+
+
+.planning-mode__button {
+  flex: 1;
+
+  max-width: 120px;
+  height: 32px;
+
+  padding: 0 14px;
+
+  border: 1px solid rgba(168, 180, 134, 0.55);
+  border-radius: 4px;
+
+  background: $accent;
+
+  color: $background-dark;
+
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 0.04em;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+
+  &:hover {
+    background: $accent-light;
+  }
+}
+
+
+.planning-mode__button--active {
+  border-color: $accent;
+
+  background: $background-khaki;
+
+  color: $text;
+
+  cursor: default;
+
+
+  &:hover {
+    background: $background-khaki;
+  }
+}
+
+
+// ==================================================
+// STRUCTURE ACTIONS HEADER
+// ==================================================
+
+.structure-actions-header {
+  flex: 0 0 46px;
+
+  min-height: 46px;
+
+  padding:
+    6px
+    16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  border-bottom: 1px solid $border;
+
+
+  h2 {
+    margin: 0;
+
+    color: $text;
+
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+
+  .button {
+    height: 32px;
+
+    padding:
+      0
+      16px;
+  }
+}
+
+
+// ==================================================
+// STRUCTURE TREE
+// ==================================================
+
 .structure-tree {
   min-height: 0;
 
   flex: 1;
 
-  // 46 px odpowiada wysokości nagłówka godzin timeline.
-  // Dzięki temu pierwsza jednostka zaczyna się
-  // poniżej skali czasu.
   padding:
-    60px
+    0
     14px
     14px;
 
@@ -85,11 +223,13 @@
 
   gap: 8px;
 
+
   strong {
     color: $text;
 
     font-size: 13px;
   }
+
 
   span {
     max-width: 240px;
@@ -99,6 +239,7 @@
     line-height: 1.6;
   }
 }
+
 
 .empty-state__icon {
   width: 38px;

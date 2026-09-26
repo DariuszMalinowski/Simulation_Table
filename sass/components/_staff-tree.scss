@@ -1,0 +1,186 @@
+@use "../base/variables" as *;
+
+
+// --------------------------------------------------
+// STAFF TREE
+// --------------------------------------------------
+
+.staff-node {
+  width: 100%;
+}
+
+
+// --------------------------------------------------
+// STAFF ITEM
+// --------------------------------------------------
+
+.staff-item {
+  min-height: 52px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding-left:
+    calc(
+      var(--staff-depth, 0) * 24px
+    );
+
+  border-bottom:
+    1px solid rgba(214, 220, 190, 0.08);
+}
+
+
+// --------------------------------------------------
+// MARKER
+// --------------------------------------------------
+
+.staff-item__marker {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 28px;
+  padding: 0 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border:
+    1px solid rgba(168, 180, 134, 0.55);
+  border-radius: 4px;
+  color: $accent;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+// --------------------------------------------------
+// INFO
+// --------------------------------------------------
+
+.staff-item__info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+.staff-item__name {
+  overflow: hidden;
+
+  color: $text;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.staff-item__type {
+  overflow: hidden;
+
+  color: $text-muted;
+
+  font-size: 9px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// --------------------------------------------------
+// SELECTED
+// --------------------------------------------------
+
+.staff-item--selected {
+  background:
+    rgba(168, 180, 134, 0.08);
+}
+
+
+// --------------------------------------------------
+// EXPAND
+// --------------------------------------------------
+
+.staff-item__expand {
+  flex: 0 0 18px;
+
+  width: 18px;
+  height: 28px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  background: transparent;
+
+  color: $accent;
+
+  font: inherit;
+  font-size: 11px;
+
+  cursor: pointer;
+}
+
+.staff-item__expand--empty {
+  cursor: default;
+}
+
+
+// --------------------------------------------------
+// INFO
+// --------------------------------------------------
+
+.staff-item__info {
+  flex: 1;
+}
+
+
+// --------------------------------------------------
+// MENU
+// --------------------------------------------------
+
+.staff-item__menu-wrapper {
+  position: relative;
+
+  flex: 0 0 30px;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+.staff-item__menu-button {
+  width: 28px;
+  height: 28px;
+
+  padding: 0;
+
+  border:
+    1px solid rgba(168, 180, 134, 0.35);
+
+  border-radius: 4px;
+
+  background: transparent;
+
+  color: $text;
+
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  &:hover {
+    background:
+      rgba(168, 180, 134, 0.12);
+  }
+}
