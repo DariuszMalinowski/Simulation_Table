@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
@@ -38,6 +39,11 @@
 
     <header class="app-header">
 
+
+      <!-- ==================================================
+           TYTUŁ APLIKACJI
+      =================================================== -->
+
       <div class="app-title">
 
         <span class="app-title__mark">
@@ -45,6 +51,7 @@
         </span>
 
         <div>
+
           <h1>
             Staff Planner
           </h1>
@@ -52,34 +59,20 @@
           <p>
             Planowanie i harmonogram działań
           </p>
+
         </div>
 
       </div>
 
 
       <!-- ==================================================
-           CZAS POCZĄTKOWY PLANU
+           USTAWIENIA CZASU
       =================================================== -->
 
       <div class="plan-time">
 
-        <div class="plan-time__title">
-
-          <span class="panel-label">
-            CZAS POCZĄTKOWY SYMULACJI
-          </span>
-
-          <strong
-            id="planStartDtg"
-            class="plan-time__dtg"
-          >
-            -- ---- --- --
-          </strong>
-
-        </div>
-
-
         <div class="plan-time__fields">
+
 
           <!-- DATA -->
 
@@ -177,11 +170,9 @@
                 N — UTC−1
               </option>
 
-
               <option value="Z">
                 Z — UTC±0
               </option>
-
 
               <option value="A">
                 A — UTC+1 - czas zimowy
@@ -239,6 +230,93 @@
           </label>
 
 
+          <!-- ==================================================
+               CZAS OPERACYJNY
+          =================================================== -->
+
+          <div class="plan-time__operational">
+
+            <span class="plan-time__operational-label">
+              Czas operacyjny
+            </span>
+
+
+            <!-- KOD -->
+
+            <label
+              class="plan-time__field plan-time__field--operational-code"
+            >
+
+              <span>
+                Kod
+              </span>
+
+              <input
+                id="operationalTimeCode"
+                type="text"
+                value="D"
+                maxlength="5"
+                autocomplete="off"
+              >
+
+            </label>
+
+
+            <!-- ZNAK -->
+
+            <label
+              class="plan-time__field plan-time__field--operational-sign"
+            >
+
+              <span>
+                Znak
+              </span>
+
+              <select id="operationalTimeSign">
+
+                <option
+                  value="+"
+                  selected
+                >
+                  +
+                </option>
+
+                <option value="-">
+                  −
+                </option>
+
+              </select>
+
+            </label>
+
+
+            <!-- DOBA -->
+
+            <label
+              class="plan-time__field plan-time__field--operational-value"
+            >
+
+              <span>
+                Doba
+              </span>
+
+              <input
+                id="operationalTimeValue"
+                type="number"
+                value="0"
+                min="0"
+                step="1"
+                inputmode="numeric"
+                autocomplete="off"
+              >
+
+            </label>
+
+          </div>
+
+
+          <!-- USTAW -->
+
           <button
             id="setPlanStartButton"
             class="button button--primary"
@@ -253,45 +331,85 @@
 
 
       <!-- ==================================================
-           OPERACJE NA PROJEKCIE
+           DOLNY PASEK NAGŁÓWKA
       =================================================== -->
 
-      <div class="app-actions">
-
-        <button
-          id="loadProjectButton"
-          class="button button--secondary"
-          type="button"
-        >
-          Wczytaj
-        </button>
+      <div class="header-project-bar">
 
 
-        <button
-          id="saveProjectButton"
-          class="button button--secondary"
-          type="button"
-        >
-          Zapisz
-        </button>
+        <!-- CZAS POCZĄTKOWY -->
+
+        <div class="plan-time__result">
+
+          <span class="panel-label">
+            CZAS POCZĄTKOWY SYMULACJI
+          </span>
+
+          <strong
+            id="planStartDtg"
+            class="plan-time__dtg"
+          >
+            -- ---- --- --
+          </strong>
+
+          <span class="plan-time__result-separator">
+            |
+          </span>
+
+          <span class="panel-label">
+            CZAS OPERACYJNY
+          </span>
+
+          <strong
+            id="planOperationalTime"
+            class="plan-time__operational-result"
+          >
+            D
+          </strong>
+
+        </div>
 
 
-        <button
-          id="exportPdfButton"
-          class="button button--secondary"
-          type="button"
-        >
-          PDF
-        </button>
+        <!-- OPERACJE NA PROJEKCIE -->
+
+        <div class="app-actions">
+
+          <button
+            id="loadProjectButton"
+            class="button button--secondary"
+            type="button"
+          >
+            Wczytaj
+          </button>
 
 
-        <button
-          id="exportDocxButton"
-          class="button button--secondary"
-          type="button"
-        >
-          DOCX
-        </button>
+          <button
+            id="saveProjectButton"
+            class="button button--secondary"
+            type="button"
+          >
+            Zapisz
+          </button>
+
+
+          <button
+            id="exportPdfButton"
+            class="button button--secondary"
+            type="button"
+          >
+            PDF
+          </button>
+
+
+          <button
+            id="exportDocxButton"
+            class="button button--secondary"
+            type="button"
+          >
+            DOCX
+          </button>
+
+        </div>
 
       </div>
 
@@ -303,6 +421,7 @@
     =================================================== -->
 
     <main class="planner">
+
 
       <!-- ==================================================
            STRUKTURA
@@ -454,12 +573,17 @@
         <div class="timeline">
 
           <!--
-            Nagłówek osi czasu jest generowany
-            dynamicznie przez JavaScript.
+              Nagłówek osi czasu jest generowany
+              dynamicznie przez JavaScript.
 
-            Początek osi wynika z czasu
-            początkowego całego planu.
+              Początek osi wynika z czasu
+              początkowego całego planu.
           -->
+
+          <div
+            id="timelineOperationalDays"
+            class="timeline-operational-days"
+          ></div>
 
           <div
             id="timelineHeader"

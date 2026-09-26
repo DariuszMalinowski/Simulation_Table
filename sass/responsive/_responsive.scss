@@ -12,20 +12,23 @@
     gap: 10px;
   }
 
-  .app-header {
-    display: grid;
 
+  // -----------------------------------------------
+  // HEADER
+  // -----------------------------------------------
+
+  .app-header {
     grid-template-columns:
       minmax(200px, 260px)
       minmax(0, 1fr);
 
     grid-template-areas:
       "title time"
-      "actions actions";
+      "project project";
 
     align-items: center;
 
-    gap: 12px 20px;
+    gap: 10px 20px;
   }
 
   .app-title {
@@ -50,22 +53,24 @@
     justify-content: flex-end;
   }
 
-  .app-actions {
-    grid-area: actions;
+  .header-project-bar {
+    grid-area: project;
 
     width: 100%;
 
-    display: flex;
+    justify-content: flex-end;
+  }
+
+  .app-actions {
     flex-wrap: wrap;
 
     justify-content: flex-end;
-
-    gap: 8px;
-
-    padding-top: 10px;
-
-    border-top: 1px solid $border;
   }
+
+
+  // -----------------------------------------------
+  // PLANNER
+  // -----------------------------------------------
 
   .planner {
     grid-template-columns:
@@ -92,40 +97,67 @@
     padding: 10px;
   }
 
+
+  // -----------------------------------------------
+  // HEADER
+  // -----------------------------------------------
+
   .app-header {
+    grid-template-columns: 1fr;
+
+    grid-template-areas:
+      "title"
+      "time"
+      "project";
+
     align-items: stretch;
+
+    gap: 12px;
   }
 
   .app-title {
-    flex: 1 1 100%;
+    width: 100%;
   }
 
   .plan-time {
-    flex: 1 1 100%;
+    width: 100%;
 
     align-items: flex-start;
     justify-content: flex-start;
-
-    flex-direction: column;
-
-    gap: 8px;
-  }
-
-  .plan-time__title {
-    width: 100%;
   }
 
   .plan-time__fields {
     width: 100%;
 
     flex-wrap: wrap;
+
+    justify-content: flex-start;
+  }
+
+  .header-project-bar {
+    width: 100%;
+
+    justify-content: space-between;
+
+    gap: 12px;
+  }
+
+  .plan-time__result {
+    flex-wrap: wrap;
+
+    gap: 6px 10px;
   }
 
   .app-actions {
-    justify-content: flex-start;
+    justify-content: flex-end;
 
     flex-wrap: wrap;
   }
+
+
+  // -----------------------------------------------
+  // PLANNER
+  // -----------------------------------------------
 
   .planner {
     min-height: 650px;
@@ -152,6 +184,22 @@
 // PHONE
 // ==================================================
 
+@media (min-width: 601px) and (max-width: 900px) {
+  // Prawy nagłówek z obramowaniem ma 63 px: 70 + 61 = 63 + 22 + 46.
+  .structure-mode-header {
+    flex-basis: 70px;
+  }
+
+  .structure-actions-header {
+    flex-basis: 61px;
+    min-height: 61px;
+  }
+
+  .structure-tree {
+    padding: 0 10px 10px;
+  }
+}
+
 @media (max-width: 600px) {
 
   body {
@@ -172,19 +220,22 @@
     gap: 6px;
   }
 
+
+  // -----------------------------------------------
+  // PHONE - HEADER
+  // -----------------------------------------------
+
   .app-header {
     min-height: 0;
 
     padding: 10px;
-
-    display: grid;
 
     grid-template-columns: 1fr;
 
     grid-template-areas:
       "title"
       "time"
-      "actions";
+      "project";
 
     align-items: stretch;
 
@@ -228,16 +279,6 @@
     display: block;
   }
 
-  .plan-time__title {
-    margin-bottom: 8px;
-  }
-
-  .plan-time__dtg {
-    margin-top: 2px;
-
-    font-size: 14px;
-  }
-
   .plan-time__fields {
     width: 100%;
 
@@ -272,6 +313,21 @@
     }
   }
 
+
+  // -----------------------------------------------
+  // PHONE - DATE / TIME
+  // -----------------------------------------------
+
+  #planStartDate,
+  #planStartTime {
+    width: 100%;
+  }
+
+
+  // -----------------------------------------------
+  // PHONE - TIME ZONE
+  // -----------------------------------------------
+
   .plan-time__field--zone {
     grid-column: 1 / -1;
 
@@ -280,11 +336,111 @@
     }
   }
 
+
+  // -----------------------------------------------
+  // PHONE - OPERATIONAL TIME
+  // -----------------------------------------------
+
+  .plan-time__operational {
+    grid-column: 1 / -1;
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      72px
+      minmax(0, 1fr);
+
+    grid-template-rows:
+      auto
+      auto;
+
+    gap: 6px;
+  }
+
+  .plan-time__operational-label {
+    grid-column: 1 / -1;
+
+    margin-top: 2px;
+
+    font-size: 9px;
+  }
+
+  .plan-time__operational .plan-time__field {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 4px;
+
+    font-size: 10px;
+  }
+
+  .plan-time__operational .plan-time__field input,
+  .plan-time__operational .plan-time__field select {
+    width: 100%;
+    min-width: 0;
+
+    height: 40px;
+  }
+
+  .plan-time__field--operational-code {
+    grid-column: 1;
+  }
+
+  .plan-time__field--operational-sign {
+    grid-column: 2;
+  }
+
+  .plan-time__field--operational-value {
+    grid-column: 3;
+  }
+
+
+  // -----------------------------------------------
+  // PHONE - SET BUTTON
+  // -----------------------------------------------
+
   #setPlanStartButton {
     grid-column: 1 / -1;
 
     width: 100%;
     height: 42px;
+  }
+
+
+  // -----------------------------------------------
+  // PHONE - PROJECT BAR
+  // -----------------------------------------------
+
+  .header-project-bar {
+    width: 100%;
+
+    padding-top: 10px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 10px;
+  }
+
+  .plan-time__result {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+  }
+
+  .plan-time__dtg {
+    font-size: 13px;
   }
 
 
@@ -297,7 +453,8 @@
 
     display: grid;
 
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns:
+      repeat(4, 1fr);
 
     gap: 6px;
   }
@@ -443,13 +600,34 @@
     grid-template-columns: 1fr;
   }
 
-  .plan-time__field--zone,
+  .plan-time__field--zone {
+    grid-column: auto;
+  }
+
+  .plan-time__operational {
+    grid-column: auto;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      64px
+      minmax(0, 1fr);
+  }
+
   #setPlanStartButton {
     grid-column: auto;
   }
 
+  .plan-time__result {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 5px;
+  }
+
   .app-actions {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+      repeat(2, 1fr);
   }
 
   .app-title p {

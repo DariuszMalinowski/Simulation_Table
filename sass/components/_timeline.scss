@@ -59,6 +59,10 @@
 // ==================================================
 
 .timeline {
+  --timeline-hours: 24;
+  --timeline-hour-width: 80px;
+  --timeline-operational-height: 22px;
+
   min-width: 0;
   min-height: 0;
 
@@ -79,23 +83,52 @@
 // HOURS HEADER
 // ==================================================
 
+.timeline-operational-days,
+.timeline-hours {
+  width: calc(var(--timeline-hours) * var(--timeline-hour-width));
+  min-width: calc(var(--timeline-hours) * var(--timeline-hour-width));
+
+  display: grid;
+  grid-template-columns:
+    repeat(var(--timeline-hours), var(--timeline-hour-width));
+}
+
+.timeline-operational-days {
+  height: var(--timeline-operational-height);
+  flex: 0 0 var(--timeline-operational-height);
+
+  position: sticky;
+  top: 0;
+  z-index: 3;
+
+  background: rgba(35, 40, 30, 0.98);
+  // Górną linię zapewnia border-bottom nagłówka timeline.
+  border-bottom: 1px solid $border;
+}
+
+.timeline-operational-day {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-left: 1px solid $border;
+
+  color: $accent-light;
+  font-size: 10px;
+  font-weight: 600;
+}
+
 .timeline-hours {
   height: 46px;
 
-  // 24 godziny × 80 px
-  width: 1920px;
-  min-width: 1920px;
-
   flex: 0 0 46px;
-
-  display: grid;
-
-  grid-template-columns: repeat(24, 80px);
 
   align-items: stretch;
 
   position: sticky;
-  top: 0;
+  top: var(--timeline-operational-height);
 
   z-index: 2;
 
@@ -188,8 +221,8 @@
 // ==================================================
 
 .timeline-content {
-  width: 1920px;
-  min-width: 1920px;
+  width: calc(var(--timeline-hours) * var(--timeline-hour-width));
+  min-width: calc(var(--timeline-hours) * var(--timeline-hour-width));
   min-height: 100%;
 
   flex: 1;

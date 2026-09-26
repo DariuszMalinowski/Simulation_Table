@@ -186,6 +186,18 @@
 // STRUCTURE TREE
 // ==================================================
 
+// W układzie obok siebie: 71 + 68 = 71 + 22 + 46 px.
+@media (min-width: 601px) {
+  .structure-mode-header {
+    flex: 0 0 71px;
+  }
+
+  .structure-actions-header {
+    flex-basis: 68px;
+    min-height: 68px;
+  }
+}
+
 .structure-tree {
   min-height: 0;
 
