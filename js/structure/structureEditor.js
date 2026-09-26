@@ -3,8 +3,10 @@ import {
   UNIT_TYPES,
   UNIT_FACTIONS,
   createUnit,
+  updateUnit,
   getUnits,
-  getUnitById
+  getUnitById,
+  getUnitDescendantIds
 } from "../data/units.js";
 
 
@@ -32,18 +34,25 @@ function createSelectFromObject(
 
   if (emptyLabel) {
     select.appendChild(
-      createOption("", emptyLabel)
+      createOption(
+        "",
+        emptyLabel
+      )
     );
   }
 
-  Object.values(data).forEach(item => {
-    select.appendChild(
-      createOption(
-        item.id,
-        item.label
-      )
-    );
-  });
+
+  Object.values(data).forEach(
+    item => {
+      select.appendChild(
+        createOption(
+          item.id,
+          item.label
+        )
+      );
+    }
+  );
+
 
   return select;
 }
@@ -53,11 +62,13 @@ function createSelectFromObject(
 // DEFAULT CHILD LEVEL
 // --------------------------------------------------
 
-function getDefaultChildLevel(parentLevel) {
+function getDefaultChildLevel(
+  parentLevel
+) {
   /*
    * Domyślny kolejny szczebel jednostki.
    *
-   * Jest to tylko sugestia formularza.
+   * Jest to wyłącznie sugestia formularza.
    * Użytkownik nadal może ręcznie wybrać
    * dowolny inny szczebel.
    */
@@ -70,7 +81,11 @@ function getDefaultChildLevel(parentLevel) {
     platoon: "squad"
   };
 
-  return nextLevel[parentLevel] || null;
+
+  return (
+    nextLevel[parentLevel] ||
+    null
+  );
 }
 
 
@@ -99,8 +114,14 @@ function createField(
     labelText;
 
 
-  label.appendChild(title);
-  label.appendChild(input);
+  label.appendChild(
+    title
+  );
+
+  label.appendChild(
+    input
+  );
+
 
   return label;
 }
@@ -110,7 +131,9 @@ function createField(
 // PARENT SELECT
 // --------------------------------------------------
 
-function createParentSelect() {
+function createParentSelect(
+  editedUnit = null
+) {
   const select =
     document.createElement("select");
 
@@ -127,10 +150,46 @@ function createParentSelect() {
     getUnits();
 
 
+  /*
+   * Przy edycji nie możemy pozwolić,
+   * aby jednostka została przełożonym
+   * samej siebie ani aby jej potomkowie
+   * zostali jej przełożonymi.
+   */
+
+  let excludedIds =
+    new Set();
+
+
+  if (editedUnit) {
+    excludedIds =
+      getUnitDescendantIds(
+        editedUnit.id
+      );
+
+    excludedIds.add(
+      editedUnit.id
+    );
+  }
+
+
   units.forEach(unit => {
+    if (
+      excludedIds.has(
+        unit.id
+      )
+    ) {
+      return;
+    }
+
+
     const level =
-      UNIT_LEVELS[unit.level]?.shortLabel ||
-      UNIT_LEVELS[unit.level]?.label ||
+      UNIT_LEVELS[
+        unit.level
+      ]?.shortLabel ||
+      UNIT_LEVELS[
+        unit.level
+      ]?.label ||
       "";
 
 
@@ -159,14 +218,42 @@ function createParentSelect() {
 
 export function openStructureEditor({
   parentId = null,
+  unitId = null,
   onSave = null
 } = {}) {
+
+  // ------------------------------------------------
+  // MODE
+  // ------------------------------------------------
+
+  const editedUnit =
+    unitId
+      ? getUnitById(unitId)
+      : null;
+
+
+  const isEditMode =
+    Boolean(editedUnit);
+
+
+  if (
+    unitId &&
+    !editedUnit
+  ) {
+    console.error(
+      `Nie znaleziono jednostki: ${unitId}`
+    );
+
+    return;
+  }
+
 
   // ------------------------------------------------
   // PARENT
   // ------------------------------------------------
 
   const parentUnit =
+    !isEditMode &&
     parentId
       ? getUnitById(parentId)
       : null;
@@ -203,21 +290,30 @@ export function openStructureEditor({
   title.className =
     "structure-editor__title";
 
-  title.textContent =
-    parentUnit
-      ? "Dodaj jednostkę podległą"
-      : "Dodaj jednostkę";
+
+  if (isEditMode) {
+    title.textContent =
+      "Edytuj jednostkę";
+  } else if (parentUnit) {
+    title.textContent =
+      "Dodaj jednostkę podległą";
+  } else {
+    title.textContent =
+      "Dodaj jednostkę";
+  }
 
 
   const closeButton =
     document.createElement("button");
 
-  closeButton.type = "button";
+  closeButton.type =
+    "button";
 
   closeButton.className =
     "structure-editor__close";
 
-  closeButton.textContent = "×";
+  closeButton.textContent =
+    "×";
 
   closeButton.setAttribute(
     "aria-label",
@@ -225,8 +321,13 @@ export function openStructureEditor({
   );
 
 
-  header.appendChild(title);
-  header.appendChild(closeButton);
+  header.appendChild(
+    title
+  );
+
+  header.appendChild(
+    closeButton
+  );
 
 
   // ------------------------------------------------
@@ -247,7 +348,8 @@ export function openStructureEditor({
   const nameInput =
     document.createElement("input");
 
-  nameInput.type = "text";
+  nameInput.type =
+    "text";
 
   nameInput.placeholder =
     "np. 1 Batalion Zmechanizowany";
@@ -255,7 +357,8 @@ export function openStructureEditor({
   nameInput.autocomplete =
     "off";
 
-  nameInput.required = true;
+  nameInput.required =
+    true;
 
 
   // ------------------------------------------------
@@ -266,37 +369,6 @@ export function openStructureEditor({
     createSelectFromObject(
       UNIT_LEVELS
     );
-
-
-  /*
-   * Jeżeli tworzymy jednostkę podległą,
-   * automatycznie proponujemy kolejny
-   * niższy szczebel.
-   *
-   * Przykłady:
-   *
-   * Brygada  -> Pułk
-   * Pułk     -> Batalion
-   * Batalion -> Kompania
-   * Kompania -> Pluton
-   * Pluton   -> Drużyna
-   *
-   * Select pozostaje aktywny,
-   * więc użytkownik może zmienić
-   * zaproponowany szczebel.
-   */
-
-  if (parentUnit) {
-    const defaultChildLevel =
-      getDefaultChildLevel(
-        parentUnit.level
-      );
-
-    if (defaultChildLevel) {
-      levelSelect.value =
-        defaultChildLevel;
-    }
-  }
 
 
   // ------------------------------------------------
@@ -319,29 +391,75 @@ export function openStructureEditor({
     );
 
 
-  /*
-   * Jeżeli tworzymy jednostkę podległą,
-   * domyślnie dziedziczy ona stronę
-   * jednostki nadrzędnej.
-   */
-
-  if (parentUnit?.faction) {
-    factionSelect.value =
-      parentUnit.faction;
-  }
-
-
   // ------------------------------------------------
   // PARENT
   // ------------------------------------------------
 
   const parentSelect =
-    createParentSelect();
+    createParentSelect(
+      editedUnit
+    );
 
 
-  if (parentUnit) {
+  // ------------------------------------------------
+  // INITIAL VALUES
+  // ------------------------------------------------
+
+  if (isEditMode) {
+    /*
+     * EDYCJA
+     *
+     * Formularz otrzymuje aktualne dane
+     * istniejącej jednostki.
+     */
+
+    nameInput.value =
+      editedUnit.name;
+
+    levelSelect.value =
+      editedUnit.level;
+
+    typeSelect.value =
+      editedUnit.type;
+
+    factionSelect.value =
+      editedUnit.faction;
+
     parentSelect.value =
-      parentUnit.id;
+      editedUnit.parentId ||
+      "";
+
+  } else {
+    /*
+     * DODAWANIE
+     *
+     * Jeżeli jednostka jest tworzona
+     * jako podległa, proponujemy kolejny
+     * szczebel oraz dziedziczymy stronę.
+     */
+
+    if (parentUnit) {
+      const defaultChildLevel =
+        getDefaultChildLevel(
+          parentUnit.level
+        );
+
+
+      if (defaultChildLevel) {
+        levelSelect.value =
+          defaultChildLevel;
+      }
+
+
+      if (parentUnit.faction) {
+        factionSelect.value =
+          parentUnit.faction;
+      }
+
+
+      parentSelect.value =
+        parentUnit.id;
+    }
   }
 
 
@@ -356,12 +474,14 @@ export function openStructureEditor({
     )
   );
 
+
   form.appendChild(
     createField(
       "Szczebel",
       levelSelect
     )
   );
+
 
   form.appendChild(
     createField(
@@ -370,12 +490,14 @@ export function openStructureEditor({
     )
   );
 
+
   form.appendChild(
     createField(
       "Strona",
       factionSelect
     )
   );
+
 
   form.appendChild(
     createField(
@@ -399,7 +521,8 @@ export function openStructureEditor({
   const cancelButton =
     document.createElement("button");
 
-  cancelButton.type = "button";
+  cancelButton.type =
+    "button";
 
   cancelButton.className =
     "button button--secondary";
@@ -411,13 +534,16 @@ export function openStructureEditor({
   const saveButton =
     document.createElement("button");
 
-  saveButton.type = "submit";
+  saveButton.type =
+    "submit";
 
   saveButton.className =
     "button button--primary";
 
   saveButton.textContent =
-    "Dodaj";
+    isEditMode
+      ? "Zapisz zmiany"
+      : "Dodaj";
 
 
   actions.appendChild(
@@ -427,6 +553,7 @@ export function openStructureEditor({
   actions.appendChild(
     saveButton
   );
+
 
   form.appendChild(
     actions
@@ -497,7 +624,9 @@ export function openStructureEditor({
   // ------------------------------------------------
 
   function handleKeyDown(event) {
-    if (event.key === "Escape") {
+    if (
+      event.key === "Escape"
+    ) {
       close();
     }
   }
@@ -520,24 +649,40 @@ export function openStructureEditor({
 
 
       try {
-        const unit =
-          createUnit({
-            name:
-              nameInput.value,
+        const values = {
+          name:
+            nameInput.value,
 
-            level:
-              levelSelect.value,
+          level:
+            levelSelect.value,
 
-            type:
-              typeSelect.value,
+          type:
+            typeSelect.value,
 
-            faction:
-              factionSelect.value,
+          faction:
+            factionSelect.value,
 
-            parentId:
-              parentSelect.value ||
-              null
-          });
+          parentId:
+            parentSelect.value ||
+            null
+        };
+
+
+        let unit;
+
+
+        if (isEditMode) {
+          unit =
+            updateUnit(
+              editedUnit.id,
+              values
+            );
+        } else {
+          unit =
+            createUnit(
+              values
+            );
+        }
 
 
         close();
@@ -551,11 +696,18 @@ export function openStructureEditor({
         }
 
       } catch (error) {
-        console.error(error);
+        console.error(
+          error
+        );
+
 
         alert(
           error.message ||
-          "Nie udało się dodać jednostki."
+          (
+            isEditMode
+              ? "Nie udało się zapisać zmian."
+              : "Nie udało się dodać jednostki."
+          )
         );
       }
     }
@@ -569,6 +721,10 @@ export function openStructureEditor({
   requestAnimationFrame(
     () => {
       nameInput.focus();
+
+      if (isEditMode) {
+        nameInput.select();
+      }
     }
   );
 }

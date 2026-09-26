@@ -52,8 +52,8 @@ export const UNIT_TYPES = {
   },
 
   command_post: {
-  id: "command_post",
-  label: "Stanowisko dowodzenia"
+    id: "command_post",
+    label: "Stanowisko dowodzenia"
   },
 
   infantry: {
@@ -97,8 +97,8 @@ export const UNIT_TYPES = {
   },
 
   support: {
-  id: "support",
-  label: "Wsparcie"
+    id: "support",
+    label: "Wsparcie"
   },
 
   logistics: {
@@ -187,23 +187,36 @@ export function createUnit({
   parentId = null
 }) {
   if (!name || !name.trim()) {
-    throw new Error("Jednostka musi posiadać nazwę.");
+    throw new Error(
+      "Jednostka musi posiadać nazwę."
+    );
   }
 
   if (!UNIT_LEVELS[level]) {
-    throw new Error(`Nieznany szczebel jednostki: ${level}`);
+    throw new Error(
+      `Nieznany szczebel jednostki: ${level}`
+    );
   }
 
   if (!UNIT_TYPES[type]) {
-    throw new Error(`Nieznany typ jednostki: ${type}`);
+    throw new Error(
+      `Nieznany typ jednostki: ${type}`
+    );
   }
 
   if (!UNIT_FACTIONS[faction]) {
-    throw new Error(`Nieznana strona: ${faction}`);
+    throw new Error(
+      `Nieznana strona: ${faction}`
+    );
   }
 
-  if (parentId && !getUnitById(parentId)) {
-    throw new Error("Jednostka nadrzędna nie istnieje.");
+  if (
+    parentId &&
+    !getUnitById(parentId)
+  ) {
+    throw new Error(
+      "Jednostka nadrzędna nie istnieje."
+    );
   }
 
   const unit = {
@@ -217,7 +230,8 @@ export function createUnit({
 
     parentId,
 
-    createdAt: new Date().toISOString()
+    createdAt:
+      new Date().toISOString()
   };
 
   units.push(unit);
@@ -231,14 +245,18 @@ export function createUnit({
 // --------------------------------------------------
 
 export function getUnits() {
-  return units.map(unit => ({ ...unit }));
+  return units.map(
+    unit => ({ ...unit })
+  );
 }
 
 
 export function getUnitById(unitId) {
-  const unit = units.find(
-    currentUnit => currentUnit.id === unitId
-  );
+  const unit =
+    units.find(
+      currentUnit =>
+        currentUnit.id === unitId
+    );
 
   return unit || null;
 }
@@ -248,10 +266,17 @@ export function getUnitById(unitId) {
 // CHILDREN
 // --------------------------------------------------
 
-export function getUnitChildren(parentId) {
+export function getUnitChildren(
+  parentId
+) {
   return units
-    .filter(unit => unit.parentId === parentId)
-    .map(unit => ({ ...unit }));
+    .filter(
+      unit =>
+        unit.parentId === parentId
+    )
+    .map(
+      unit => ({ ...unit })
+    );
 }
 
 
@@ -261,69 +286,61 @@ export function getUnitChildren(parentId) {
 
 export function getRootUnits() {
   return units
-    .filter(unit => unit.parentId === null)
-    .map(unit => ({ ...unit }));
+    .filter(
+      unit =>
+        unit.parentId === null
+    )
+    .map(
+      unit => ({ ...unit })
+    );
 }
 
 
 // --------------------------------------------------
-// UPDATE UNIT
+// DESCENDANTS
 // --------------------------------------------------
 
-export function updateUnit(unitId, changes = {}) {
-  const unit = getUnitById(unitId);
+export function getUnitDescendantIds(
+  unitId
+) {
+  const descendantIds =
+    new Set();
 
-  if (!unit) {
-    return null;
-  }
+  const queue =
+    [unitId];
 
-  const storedUnit = units.find(
-    currentUnit => currentUnit.id === unitId
-  );
 
-  if (changes.name !== undefined) {
-    const newName = String(changes.name).trim();
+  while (queue.length > 0) {
+    const currentId =
+      queue.shift();
 
-    if (!newName) {
-      throw new Error(
-        "Jednostka musi posiadać nazwę."
+
+    const children =
+      units.filter(
+        unit =>
+          unit.parentId === currentId
       );
-    }
 
-    storedUnit.name = newName;
-  }
 
-  if (changes.level !== undefined) {
-    if (!UNIT_LEVELS[changes.level]) {
-      throw new Error(
-        `Nieznany szczebel jednostki: ${changes.level}`
+    children.forEach(child => {
+      if (
+        descendantIds.has(child.id)
+      ) {
+        return;
+      }
+
+      descendantIds.add(
+        child.id
       );
-    }
 
-    storedUnit.level = changes.level;
-  }
-
-  if (changes.type !== undefined) {
-    if (!UNIT_TYPES[changes.type]) {
-      throw new Error(
-        `Nieznany typ jednostki: ${changes.type}`
+      queue.push(
+        child.id
       );
-    }
-
-    storedUnit.type = changes.type;
+    });
   }
 
-  if (changes.faction !== undefined) {
-    if (!UNIT_FACTIONS[changes.faction]) {
-      throw new Error(
-        `Nieznana strona: ${changes.faction}`
-      );
-    }
 
-    storedUnit.faction = changes.faction;
-  }
-
-  return { ...storedUnit };
+  return descendantIds;
 }
 
 
@@ -335,19 +352,28 @@ export function setUnitParent(
   unitId,
   parentId = null
 ) {
-  const unit = units.find(
-    currentUnit => currentUnit.id === unitId
-  );
+  const unit =
+    units.find(
+      currentUnit =>
+        currentUnit.id === unitId
+    );
+
 
   if (!unit) {
     return false;
   }
+
+
+  // Jednostka nie może podlegać sama sobie.
 
   if (parentId === unitId) {
     throw new Error(
       "Jednostka nie może być własnym przełożonym."
     );
   }
+
+
+  // Nowy przełożony musi istnieć.
 
   if (
     parentId !== null &&
@@ -358,9 +384,164 @@ export function setUnitParent(
     );
   }
 
-  unit.parentId = parentId;
+
+  /*
+   * Nie można ustawić potomka jako przełożonego.
+   *
+   * Przykład niedozwolony:
+   *
+   * Brygada
+   * └── Batalion
+   *     └── Kompania
+   *
+   * Kompania nie może zostać przełożonym Brygady.
+   */
+
+  if (parentId !== null) {
+    const descendantIds =
+      getUnitDescendantIds(
+        unitId
+      );
+
+
+    if (
+      descendantIds.has(parentId)
+    ) {
+      throw new Error(
+        "Jednostka podległa nie może zostać przełożonym swojej jednostki nadrzędnej."
+      );
+    }
+  }
+
+
+  unit.parentId =
+    parentId;
 
   return true;
+}
+
+
+// --------------------------------------------------
+// UPDATE UNIT
+// --------------------------------------------------
+
+export function updateUnit(
+  unitId,
+  changes = {}
+) {
+  const storedUnit =
+    units.find(
+      currentUnit =>
+        currentUnit.id === unitId
+    );
+
+
+  if (!storedUnit) {
+    return null;
+  }
+
+
+  // NAME
+
+  if (
+    changes.name !== undefined
+  ) {
+    const newName =
+      String(
+        changes.name
+      ).trim();
+
+
+    if (!newName) {
+      throw new Error(
+        "Jednostka musi posiadać nazwę."
+      );
+    }
+
+
+    storedUnit.name =
+      newName;
+  }
+
+
+  // LEVEL
+
+  if (
+    changes.level !== undefined
+  ) {
+    if (
+      !UNIT_LEVELS[
+        changes.level
+      ]
+    ) {
+      throw new Error(
+        `Nieznany szczebel jednostki: ${changes.level}`
+      );
+    }
+
+
+    storedUnit.level =
+      changes.level;
+  }
+
+
+  // TYPE
+
+  if (
+    changes.type !== undefined
+  ) {
+    if (
+      !UNIT_TYPES[
+        changes.type
+      ]
+    ) {
+      throw new Error(
+        `Nieznany typ jednostki: ${changes.type}`
+      );
+    }
+
+
+    storedUnit.type =
+      changes.type;
+  }
+
+
+  // FACTION
+
+  if (
+    changes.faction !== undefined
+  ) {
+    if (
+      !UNIT_FACTIONS[
+        changes.faction
+      ]
+    ) {
+      throw new Error(
+        `Nieznana strona: ${changes.faction}`
+      );
+    }
+
+
+    storedUnit.faction =
+      changes.faction;
+  }
+
+
+  // PARENT
+
+  if (
+    changes.parentId !== undefined
+  ) {
+    setUnitParent(
+      unitId,
+      changes.parentId
+    );
+  }
+
+
+  return {
+    ...storedUnit
+  };
 }
 
 
@@ -368,42 +549,45 @@ export function setUnitParent(
 // DELETE UNIT
 // --------------------------------------------------
 
-export function deleteUnit(unitId) {
-  const exists = units.some(
-    unit => unit.id === unitId
-  );
+export function deleteUnit(
+  unitId
+) {
+  const exists =
+    units.some(
+      unit =>
+        unit.id === unitId
+    );
+
 
   if (!exists) {
     return false;
   }
 
+
   /*
-   * Na tym etapie usuwamy również wszystkie
-   * jednostki podległe.
+   * Usuwamy wskazaną jednostkę
+   * oraz wszystkie jednostki podległe.
    */
 
-  const idsToDelete = new Set([unitId]);
+  const idsToDelete =
+    getUnitDescendantIds(
+      unitId
+    );
 
-  let foundChildren = true;
 
-  while (foundChildren) {
-    foundChildren = false;
-
-    for (const unit of units) {
-      if (
-        unit.parentId &&
-        idsToDelete.has(unit.parentId) &&
-        !idsToDelete.has(unit.id)
-      ) {
-        idsToDelete.add(unit.id);
-        foundChildren = true;
-      }
-    }
-  }
-
-  units = units.filter(
-    unit => !idsToDelete.has(unit.id)
+  idsToDelete.add(
+    unitId
   );
+
+
+  units =
+    units.filter(
+      unit =>
+        !idsToDelete.has(
+          unit.id
+        )
+    );
+
 
   return true;
 }
@@ -422,14 +606,22 @@ export function clearUnits() {
 // IMPORT / LOAD
 // --------------------------------------------------
 
-export function setUnits(newUnits) {
-  if (!Array.isArray(newUnits)) {
+export function setUnits(
+  newUnits
+) {
+  if (
+    !Array.isArray(newUnits)
+  ) {
     throw new Error(
       "Nieprawidłowa lista jednostek."
     );
   }
 
-  units = newUnits.map(unit => ({
-    ...unit
-  }));
+
+  units =
+    newUnits.map(
+      unit => ({
+        ...unit
+      })
+    );
 }

@@ -1,7 +1,9 @@
 import {
   getUnits,
   UNIT_LEVELS,
-  UNIT_TYPES
+  UNIT_TYPES,
+  getUnitDescendantIds,
+  deleteUnit
 } from "../data/units.js";
 
 import {
@@ -22,6 +24,21 @@ let selectedUnitId = null;
 const collapsedUnitIds =
   new Set();
 
+// --------------------------------------------------
+// UNIT MENU
+// --------------------------------------------------
+
+function closeUnitMenus() {
+  document
+    .querySelectorAll(
+      ".structure-unit__menu--open"
+    )
+    .forEach(menu => {
+      menu.classList.remove(
+        "structure-unit__menu--open"
+      );
+    });
+}
 
 // --------------------------------------------------
 // HELPERS
@@ -256,6 +273,10 @@ function createUnitActions(unit) {
     "structure-unit__actions";
 
 
+  // ------------------------------------------------
+  // MENU BUTTON
+  // ------------------------------------------------
+
   const menuButton =
     document.createElement("button");
 
@@ -277,12 +298,20 @@ function createUnitActions(unit) {
   );
 
 
+  // ------------------------------------------------
+  // MENU
+  // ------------------------------------------------
+
   const menu =
     document.createElement("div");
 
   menu.className =
     "structure-unit__menu";
 
+
+  // ------------------------------------------------
+  // ADD CHILD
+  // ------------------------------------------------
 
   const addChildButton =
     document.createElement("button");
@@ -297,30 +326,99 @@ function createUnitActions(unit) {
     "+ Dodaj podległą";
 
 
+  // ------------------------------------------------
+  // EDIT
+  // ------------------------------------------------
+
+  const editButton =
+    document.createElement("button");
+
+  editButton.type =
+    "button";
+
+  editButton.className =
+    "structure-unit__menu-item";
+
+  editButton.textContent =
+    "Edytuj";
+
+// ------------------------------------------------
+// DELETE
+// ------------------------------------------------
+
+  const deleteButton =
+    document.createElement("button");
+
+  deleteButton.type =
+    "button";
+
+  deleteButton.className =
+    "structure-unit__menu-item structure-unit__menu-item--danger";
+
+  deleteButton.textContent =
+    "Usuń";
+
+  // ------------------------------------------------
+  // MENU STRUCTURE
+  // ------------------------------------------------
+
   menu.appendChild(
     addChildButton
   );
 
+  menu.appendChild(
+    editButton
+  );
 
-  // ----------------------------------------------
+  menu.appendChild(
+    deleteButton
+  );
+
+
+  // ------------------------------------------------
   // OPEN / CLOSE MENU
-  // ----------------------------------------------
+  // ------------------------------------------------
 
   menuButton.addEventListener(
     "click",
     event => {
       event.stopPropagation();
 
-      menu.classList.toggle(
-        "structure-unit__menu--open"
-      );
+
+      const wasOpen =
+        menu.classList.contains(
+          "structure-unit__menu--open"
+        );
+
+
+      /*
+      * Najpierw zamykamy wszystkie
+      * otwarte menu jednostek.
+      */
+
+      closeUnitMenus();
+
+
+      /*
+      * Jeżeli kliknięte menu wcześniej
+      * było zamknięte, otwieramy je.
+      *
+      * Jeżeli było otwarte, pozostaje
+      * zamknięte.
+      */
+
+      if (!wasOpen) {
+        menu.classList.add(
+          "structure-unit__menu--open"
+        );
+      }
     }
   );
 
 
-  // ----------------------------------------------
-  // ADD CHILD
-  // ----------------------------------------------
+  // ------------------------------------------------
+  // ADD CHILD ACTION
+  // ------------------------------------------------
 
   addChildButton.addEventListener(
     "click",
@@ -338,6 +436,7 @@ function createUnitActions(unit) {
            * aby użytkownik od razu zobaczył
            * nowo utworzoną jednostkę.
            */
+
           collapsedUnitIds.delete(
             unit.id
           );
@@ -348,6 +447,172 @@ function createUnitActions(unit) {
     }
   );
 
+
+  // ------------------------------------------------
+  // EDIT ACTION
+  // ------------------------------------------------
+
+  editButton.addEventListener(
+    "click",
+    event => {
+      event.stopPropagation();
+
+
+      openStructureEditor({
+        unitId: unit.id,
+
+        onSave: updatedUnit => {
+          /*
+           * Jeżeli podczas edycji zmieniono
+           * przełożonego jednostki, rozwijamy
+           * nową gałąź nadrzędną.
+           */
+
+          if (
+            updatedUnit?.parentId
+          ) {
+            collapsedUnitIds.delete(
+              updatedUnit.parentId
+            );
+          }
+
+
+          renderStructureTree();
+        }
+      });
+    }
+  );
+
+  // ------------------------------------------------
+  // DELETE ACTION
+  // ------------------------------------------------
+
+  deleteButton.addEventListener(
+    "click",
+    event => {
+      event.stopPropagation();
+
+
+      const descendantIds =
+        getUnitDescendantIds(
+          unit.id
+        );
+
+      const descendantCount =
+        descendantIds.size;
+
+
+      /*
+      * Inny komunikat pokazujemy dla
+      * pojedynczej jednostki, a inny
+      * dla całej gałęzi struktury.
+      */
+
+      let message;
+
+
+      if (descendantCount === 0) {
+        message =
+          `Czy na pewno chcesz usunąć jednostkę:\n\n${unit.name}?`;
+      } else {
+        message =
+          `Czy na pewno chcesz usunąć jednostkę:\n\n` +
+          `${unit.name}\n\n` +
+          `Razem z nią zostaną usunięte wszystkie jednostki podległe (${descendantCount}).\n\n` +
+          `Tej operacji nie można cofnąć.`;
+      }
+
+
+      const confirmed =
+        window.confirm(
+          message
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      /*
+      * Usuwamy ID usuwanych elementów również
+      * ze stanu zwiniętych gałęzi.
+      */
+
+      descendantIds.forEach(
+        descendantId => {
+          collapsedUnitIds.delete(
+            descendantId
+          );
+        }
+      );
+
+
+      collapsedUnitIds.delete(
+        unit.id
+      );
+
+
+      const deleted =
+        deleteUnit(
+          unit.id
+        );
+
+
+      if (!deleted) {
+        alert(
+          "Nie udało się usunąć jednostki."
+        );
+
+        return;
+      }
+
+
+      /*
+      * Usuwana jednostka była zaznaczona,
+      * więc czyścimy zaznaczenie.
+      */
+
+      if (
+        selectedUnitId === unit.id
+      ) {
+        selectedUnitId =
+          null;
+      }
+
+
+      renderStructureTree();
+
+
+      /*
+      * Informujemy przyszłe elementy aplikacji,
+      * że struktura została zmieniona.
+      *
+      * Przyda się później m.in. harmonogramowi.
+      */
+
+      document.dispatchEvent(
+        new CustomEvent(
+          "structure:unit-deleted",
+          {
+            detail: {
+              unitId:
+                unit.id,
+
+              descendantIds:
+                [
+                  ...descendantIds
+                ]
+            }
+          }
+        )
+      );
+    }
+  );
+
+  // ------------------------------------------------
+  // ACTIONS STRUCTURE
+  // ------------------------------------------------
 
   actions.appendChild(
     menuButton
@@ -668,3 +933,22 @@ export function clearSelectedUnit() {
 
   renderStructureTree();
 }
+
+// --------------------------------------------------
+// CLOSE UNIT MENU ON OUTSIDE CLICK
+// --------------------------------------------------
+
+document.addEventListener(
+  "click",
+  event => {
+    const clickedInsideActions =
+      event.target.closest(
+        ".structure-unit__actions"
+      );
+
+
+    if (!clickedInsideActions) {
+      closeUnitMenus();
+    }
+  }
+);
